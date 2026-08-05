@@ -12,30 +12,30 @@ const projects: Project[] = [
     title: 'Booking Ruang Stasiun',
     org: 'MRT Jakarta — Station Digitalization Intern',
     problem:
-      'Booking ruang di 13 stasiun MRT dikoordinasi manual, tidak ada visibility bersama antara planner dan staff stasiun.',
+      'Booking ruang di 13 stasiun MRT masih manual, planner sama staff stasiun juga nggak bisa saling liat jadwal.',
     solution:
-      'Membangun platform booking full-CRUD dengan role-based access (super admin, planner, area authority) dan auto email confirmation.',
-    impact: 'Menggantikan proses manual di 13 stasiun sekaligus.',
+      'Bikin platform booking full-CRUD, ada role beda-beda (super admin, planner, area authority), plus otomatis kirim email konfirmasi.',
+    impact: 'Proses manual di 13 stasiun langsung kegantiin semua.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Vercel', 'Brevo SMTP'],
   },
   {
     title: 'Bank Data Station Dashboard',
     org: 'MRT Jakarta',
     problem:
-      'Shift report dikompilasi lewat Excel Online yang lambat dan rawan error.',
+      'Bikin shift report masih pake Excel Online, lemot dan gampang salah.',
     solution:
-      'Membangun CSV-upload pipeline dengan dashboard yang filterable, di-deploy di Vercel.',
-    impact: 'Kompilasi shift report jadi cepat dan minim human error.',
+      'Bikin sistem upload CSV yang langsung masuk dashboard, bisa difilter-filter, di-deploy di Vercel.',
+    impact: 'Bikin shift report jadi cepet dan minim typo/salah input.',
     stack: ['React', 'TypeScript', 'Supabase', 'Cloudflare'],
   },
   {
     title: 'Station Digitalization Proposal',
     org: 'MRT Jakarta',
     problem:
-      'Regional planner butuh business case yang lebih kuat untuk justifikasi investasi IT.',
+      'Regional planner butuh alasan yang lebih kuat buat ngeyakinin investasi IT.',
     solution:
-      'Menulis BRD/PRD, mendesain mockup di Figma, dan proaktif membangun working prototype — bukan sekadar mockup.',
-    impact: 'Business case didukung prototype nyata, bukan cuma dokumen.',
+      'Nulis BRD/PRD, bikin mockup di Figma, terus gas bikin prototype yang beneran jalan — bukan cuma mockup doang.',
+    impact: 'Business case-nya jadi lebih kuat karena ada prototype beneran, bukan cuma dokumen.',
     stack: ['Figma', 'PRD/BRD', 'React'],
   },
 ]
@@ -51,9 +51,9 @@ function Projects() {
     <section id="projects" className="mx-auto max-w-5xl px-6 py-24">
       <h2 className="font-pixel text-xl text-cyan">// PROJECTS</h2>
       <p className="mt-4 max-w-xl text-sm text-slate-400">
-        Case study dari internship di MRT Jakarta — dari requirements
-        gathering sampai deployment. (Repo private — masih dipakai
-        production.)
+        Beberapa project pas magang di MRT Jakarta, dari mikirin kebutuhannya
+        sampe jadi aplikasi beneran. (Repo-nya private soalnya masih dipake
+        sampe sekarang.)
       </p>
 
       <div className="mt-10 space-y-8">

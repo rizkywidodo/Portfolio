@@ -26,9 +26,10 @@ function Hero() {
           Rizky Widodo
         </h1>
         <p className="mt-6 max-w-xl leading-relaxed text-slate-400">
-          Fresh grad dengan 1 tahun pengalaman hands-on bikin & ship internal
-          web app — dari requirements gathering & PRD writing sampai
-          deployment. Lintas sektor transportasi dan financial services.
+          Fresh grad yang udah setahun ngoding aplikasi internal yang beneran
+          dipake orang — mulai dari ngumpulin kebutuhan, bikin PRD, sampe
+          deploy sendiri. Pernah kerja bareng tim transportasi (MRT Jakarta)
+          & financial services.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
