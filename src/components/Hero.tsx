@@ -1,9 +1,11 @@
 import HeroBackground from './HeroBackground'
 
-const facts = [
-  { label: 'Location', value: 'Greater Jakarta Area, Indonesia' },
-  { label: 'Education', value: 'ITS — Informatics Engineering, GPA 3.32' },
-  { label: 'Status', value: 'Open to work' },
+const contacts = [
+  { label: 'Email', href: 'mailto:mrizkywidodo@gmail.com' },
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/in/muhammad-rizky-widodo',
+  },
 ]
 
 function Hero() {
@@ -15,49 +17,44 @@ function Hero() {
       <HeroBackground />
 
       <div className="mx-auto max-w-5xl">
-        <p className="animate-fade-up text-sm font-medium tracking-wide text-accent uppercase dark:text-accent-dark">
-          Informatics Engineering Graduate — ITS 2025
+        <p className="font-pixel text-[11px] tracking-widest text-yellow">
+          &gt; INFORMATICS ENGINEERING GRAD, ITS 2025
         </p>
-        <h1 className="animate-fade-up mt-4 text-5xl font-semibold tracking-tight text-neutral-900 [animation-delay:0.1s] md:text-7xl dark:text-white">
-          Muhammad Rizky
+        <h1 className="font-pixel mt-6 text-3xl leading-[1.6] text-cyan md:text-5xl">
+          Muhammad
           <br />
-          Widodo
+          Rizky Widodo
         </h1>
-        <p className="animate-fade-up mt-6 max-w-2xl text-lg leading-relaxed [animation-delay:0.2s]">
+        <p className="mt-6 max-w-xl leading-relaxed text-slate-400">
           Fresh grad dengan 1 tahun pengalaman hands-on bikin & ship internal
-          web app. Terbiasa identifikasi pain point operasional dan deliver
-          solusi full-stack sendiri, dari requirements gathering & PRD writing
-          sampai deployment — lintas sektor transportasi dan financial
-          services.
+          web app — dari requirements gathering & PRD writing sampai
+          deployment. Lintas sektor transportasi dan financial services.
         </p>
 
-        <div className="animate-fade-up mt-8 flex flex-wrap gap-4 [animation-delay:0.3s]">
+        <div className="mt-8 flex flex-wrap gap-4">
           <a
             href="#projects"
-            className="rounded-full bg-neutral-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-accent dark:bg-white dark:text-neutral-900 dark:hover:bg-accent-dark"
+            className="font-pixel border-4 border-cyan bg-cyan px-5 py-3 text-[11px] text-bg shadow-[4px_4px_0_0_#131829] transition-transform hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#131829]"
           >
-            View Projects
+            VIEW PROJECTS
           </a>
-          <a
-            href="#contact"
-            className="rounded-full border border-neutral-300 px-6 py-3 text-sm font-medium text-neutral-900 transition-colors hover:border-accent hover:text-accent dark:border-neutral-700 dark:text-white dark:hover:border-accent-dark dark:hover:text-accent-dark"
-          >
-            Get in Touch
-          </a>
+          {contacts.map((contact) => (
+            <a
+              key={contact.label}
+              href={contact.href}
+              target={contact.label === 'LinkedIn' ? '_blank' : undefined}
+              rel={contact.label === 'LinkedIn' ? 'noreferrer' : undefined}
+              className="font-pixel border-4 border-border px-5 py-3 text-[11px] text-slate-300 shadow-[4px_4px_0_0_#131829] transition-transform hover:-translate-y-0.5 hover:border-pink hover:text-pink hover:shadow-[6px_6px_0_0_#131829]"
+            >
+              {contact.label.toUpperCase()}
+            </a>
+          ))}
         </div>
 
-        <dl className="animate-fade-up mt-16 grid max-w-2xl grid-cols-1 gap-6 border-t border-neutral-200 pt-8 [animation-delay:0.4s] sm:grid-cols-3 dark:border-neutral-800">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt className="text-xs font-medium tracking-wide text-neutral-400 uppercase dark:text-neutral-500">
-                {fact.label}
-              </dt>
-              <dd className="mt-1 text-sm text-neutral-700 dark:text-neutral-300">
-                {fact.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <p className="font-pixel mt-16 inline-flex items-center gap-2 text-[10px] text-green">
+          <span className="animate-blink h-2 w-2 bg-green" />
+          OPEN TO WORK — GREATER JAKARTA AREA
+        </p>
       </div>
     </section>
   )

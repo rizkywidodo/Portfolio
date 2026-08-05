@@ -40,64 +40,63 @@ const projects: Project[] = [
   },
 ]
 
+const labelColor: Record<string, string> = {
+  PROBLEM: 'text-pink',
+  SOLUTION: 'text-cyan',
+  IMPACT: 'text-yellow',
+}
+
 function Projects() {
   return (
     <section id="projects" className="mx-auto max-w-5xl px-6 py-24">
-      <h2 className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white">
-        Projects
-      </h2>
-      <p className="mt-2 max-w-xl text-neutral-500 dark:text-neutral-400">
+      <h2 className="font-pixel text-xl text-cyan">// PROJECTS</h2>
+      <p className="mt-4 max-w-xl text-sm text-slate-400">
         Case study dari internship di MRT Jakarta — dari requirements
-        gathering sampai deployment.
+        gathering sampai deployment. (Repo private — masih dipakai
+        production.)
       </p>
 
-      <div className="mt-12 space-y-6">
+      <div className="mt-10 space-y-8">
         {projects.map((project) => (
           <article
             key={project.title}
-            className="group rounded-2xl border border-neutral-200 p-8 transition-colors hover:border-accent/50 dark:border-neutral-800 dark:hover:border-accent-dark/50"
+            className="border-4 border-border bg-panel p-8 shadow-[8px_8px_0_0_#2a3152] transition-transform hover:-translate-y-1"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 className="text-xl font-medium text-neutral-900 dark:text-white">
+              <h3 className="font-pixel text-sm text-slate-100 md:text-base">
                 {project.title}
               </h3>
-              <span className="text-sm text-neutral-400 dark:text-neutral-500">
+              <span className="font-pixel text-[10px] text-slate-500">
                 {project.org}
               </span>
             </div>
 
-            <dl className="mt-6 grid gap-6 sm:grid-cols-3">
-              <div>
-                <dt className="text-xs font-medium tracking-wide text-accent uppercase dark:text-accent-dark">
-                  Problem
-                </dt>
-                <dd className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  {project.problem}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium tracking-wide text-accent uppercase dark:text-accent-dark">
-                  Solution
-                </dt>
-                <dd className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  {project.solution}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium tracking-wide text-accent uppercase dark:text-accent-dark">
-                  Impact
-                </dt>
-                <dd className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  {project.impact}
-                </dd>
-              </div>
+            <dl className="mt-8 grid gap-6 sm:grid-cols-3">
+              {(
+                [
+                  ['PROBLEM', project.problem],
+                  ['SOLUTION', project.solution],
+                  ['IMPACT', project.impact],
+                ] as const
+              ).map(([label, text]) => (
+                <div key={label}>
+                  <dt
+                    className={`font-pixel text-[10px] tracking-wide ${labelColor[label]}`}
+                  >
+                    {label}
+                  </dt>
+                  <dd className="mt-3 text-sm leading-relaxed text-slate-400">
+                    {text}
+                  </dd>
+                </div>
+              ))}
             </dl>
 
-            <ul className="mt-6 flex flex-wrap gap-2">
+            <ul className="mt-8 flex flex-wrap gap-2">
               {project.stack.map((tech) => (
                 <li
                   key={tech}
-                  className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400"
+                  className="border-2 border-border px-3 py-1 text-[10px] text-slate-400"
                 >
                   {tech}
                 </li>

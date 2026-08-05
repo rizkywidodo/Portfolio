@@ -1,25 +1,25 @@
 const links = [
+  { href: '#education', label: 'Education' },
   { href: '#projects', label: 'Projects' },
   { href: '#skills', label: 'Skills' },
-  { href: '#contact', label: 'Contact' },
 ]
 
 function Navbar() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-neutral-200/80 bg-white/70 backdrop-blur-md dark:border-neutral-800/80 dark:bg-neutral-950/70">
+    <header className="fixed inset-x-0 top-0 z-50 border-b-4 border-border bg-bg/90 backdrop-blur">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         <a
           href="#top"
-          className="font-semibold tracking-tight text-neutral-900 dark:text-white"
+          className="font-pixel text-xs text-cyan"
         >
-          Rizky Widodo
+          RW_
         </a>
-        <ul className="flex items-center gap-6 text-sm">
+        <ul className="flex items-center gap-6 font-pixel text-[10px] tracking-wide text-slate-400 uppercase">
           {links.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+                className="transition-colors hover:text-pink"
               >
                 {link.label}
               </a>

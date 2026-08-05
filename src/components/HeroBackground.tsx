@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
+import PixelStar from './PixelStar'
 
 // Heavy (three.js) — only fetched when actually rendered, so mobile /
 // reduced-motion visitors never pay for this bundle.
@@ -26,10 +27,31 @@ function HeroBackground() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
     >
-      {/* CSS-only ambient glow: instant paint, and the full fallback on
-          mobile / reduced-motion where the 3D scene never loads. */}
-      <div className="animate-float absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-accent/30 blur-3xl dark:bg-accent-dark/20" />
-      <div className="animate-float absolute top-40 right-[-6rem] h-72 w-72 rounded-full bg-accent/20 blur-3xl [animation-delay:-3s] dark:bg-accent-dark/15" />
+      {/* Soft ambient light wash behind the gem — kept blurred since this
+          reads as lighting, not pixel art, so it doesn't fight the crisp
+          pixel elements. */}
+      <div className="absolute top-24 -right-16 h-72 w-72 rounded-full bg-cyan/20 blur-3xl" />
+
+      <PixelStar
+        color="pink"
+        size={10}
+        className="absolute top-32 left-[8%] [animation-delay:-1s]"
+      />
+      <PixelStar
+        color="yellow"
+        size={8}
+        className="absolute top-[55%] left-[20%] [animation-delay:-3s]"
+      />
+      <PixelStar
+        color="cyan"
+        size={10}
+        className="absolute top-[20%] left-[55%] [animation-delay:-2s]"
+      />
+      <PixelStar
+        color="pink"
+        size={8}
+        className="absolute top-[70%] left-[45%] [animation-delay:-4s]"
+      />
 
       {canRender3D && (
         <Suspense fallback={null}>
