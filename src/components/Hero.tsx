@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import HeroBackground from './HeroBackground'
 
 const contacts = [
@@ -26,19 +27,20 @@ function Hero() {
           Rizky Widodo
         </h1>
         <p className="mt-6 max-w-xl leading-relaxed text-slate-400">
-          Fresh grad yang udah setahun ngoding aplikasi internal yang beneran
-          dipake orang — mulai dari ngumpulin kebutuhan, bikin PRD, sampe
-          deploy sendiri. Pernah kerja bareng tim transportasi (MRT Jakarta)
-          & financial services.
+          Fresh grad who spent the past year coding things people actually
+          use at work, not just class assignments — talking through
+          requirements, writing PRDs, shipping it myself. Split my time
+          between two very different worlds: public transit (MRT Jakarta)
+          and banking (BRI).
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
-          <a
-            href="#projects"
+          <Link
+            to="/projects"
             className="font-pixel border-4 border-cyan bg-cyan px-5 py-3 text-[11px] text-bg shadow-[4px_4px_0_0_#131829] transition-transform hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#131829]"
           >
             VIEW PROJECTS
-          </a>
+          </Link>
           {contacts.map((contact) => (
             <a
               key={contact.label}
