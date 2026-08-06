@@ -3,31 +3,38 @@ import PixelSprite from './PixelSprite'
 import { ALIEN_PATTERN, SHIP_COLORS, SHIP_PATTERN } from './pixelSprites'
 import { playExplosion, playShoot, unlockAudio } from '../lib/sound'
 
-type Alien = { id: string; x: number; y: number; color: string; alive: boolean }
+type Alien = {
+  id: string
+  x: number
+  y: number
+  color: string
+  hidden: boolean
+}
 type Bullet = { id: string; x: number; y: number }
 type Explosion = { id: string; x: number; y: number; color: string }
 
 const ALIEN_COLORS = ['#ff4fd8', '#ffe14d', '#7dffb3', '#2ee6ff']
+const ALIEN_COUNT = 16
+const DESCEND_PER_TICK = 0.28 // percent of battlefield height
+const DESCEND_EVERY_N_FRAMES = 3
+const RESPAWN_DELAY_MS = 220
 const BULLET_SPEED = 2.4 // percent of battlefield height per frame
 const HIT_RADIUS = 6 // percent
 const FIRE_INTERVAL_MS = 450
 const PARTICLE_ANGLES = [0, 60, 120, 180, 240, 300]
 
-function makeWave(): Alien[] {
-  const aliens: Alien[] = []
-  let id = 0
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 6; col++) {
-      aliens.push({
-        id: `a${id++}`,
-        x: 8 + col * 16.8,
-        y: 10 + row * 13,
-        color: ALIEN_COLORS[(row + col) % ALIEN_COLORS.length],
-        alive: true,
-      })
-    }
-  }
-  return aliens
+const randomColor = () =>
+  ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)]
+const randomX = () => 5 + Math.random() * 90
+
+function makePool(): Alien[] {
+  return Array.from({ length: ALIEN_COUNT }, (_, i) => ({
+    id: `a${i}`,
+    x: randomX(),
+    y: Math.random() * 60 - 10, // staggered so it's already full on first paint
+    color: randomColor(),
+    hidden: false,
+  }))
 }
 
 const clamp = (n: number, min: number, max: number) =>
@@ -36,15 +43,18 @@ const clamp = (n: number, min: number, max: number) =>
 function SpaceInvaders() {
   const battlefieldRef = useRef<HTMLDivElement>(null)
   const [shipX, setShipX] = useState(50)
-  const [aliens, setAliens] = useState<Alien[]>(() => makeWave())
+  const [aliens, setAliens] = useState<Alien[]>(() => makePool())
   const [bullets, setBullets] = useState<Bullet[]>([])
   const [explosions, setExplosions] = useState<Explosion[]>([])
-  const [soundOn, setSoundOn] = useState(false)
+  const [soundOn, setSoundOn] = useState(true)
 
   const aliensRef = useRef(aliens)
   const bulletsRef = useRef(bullets)
   const shipXRef = useRef(shipX)
   const soundOnRef = useRef(soundOn)
+  const frameRef = useRef(0)
+  const respawnTimeouts = useRef<ReturnType<typeof setTimeout>[]>([])
+
   useEffect(() => {
     aliensRef.current = aliens
   }, [aliens])
@@ -55,15 +65,43 @@ function SpaceInvaders() {
     soundOnRef.current = soundOn
   }, [soundOn])
 
-  // Single rAF loop: moves bullets up and checks alien collisions each
-  // frame. Reads current state via refs (not the closed-over `aliens`/
-  // `bullets`) so the effect never needs to restart.
+  // First real click anywhere on the page satisfies the browser's
+  // autoplay-gesture requirement, so sound-on-by-default actually works
+  // once the visitor interacts at all (not just with this widget).
+  useEffect(() => {
+    const unlock = () => unlockAudio()
+    window.addEventListener('pointerdown', unlock, { once: true })
+    return () => window.removeEventListener('pointerdown', unlock)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      for (const t of respawnTimeouts.current) clearTimeout(t)
+    }
+  }, [])
+
+  // Single rAF loop: descends aliens, moves bullets up, and checks
+  // collisions each frame. Reads current state via refs (not the
+  // closed-over `aliens`/`bullets`) so the effect never needs to restart.
   useEffect(() => {
     let raf: number
 
     const tick = () => {
+      frameRef.current += 1
       const currentBullets = bulletsRef.current
-      const currentAliens = aliensRef.current
+      let currentAliens = aliensRef.current
+
+      if (frameRef.current % DESCEND_EVERY_N_FRAMES === 0) {
+        currentAliens = currentAliens.map((a) => {
+          if (a.hidden) return a
+          const y = a.y + DESCEND_PER_TICK
+          return y > 78
+            ? { ...a, x: randomX(), y: -8, color: randomColor() }
+            : { ...a, y }
+        })
+        aliensRef.current = currentAliens
+        setAliens(currentAliens)
+      }
 
       if (currentBullets.length > 0) {
         const hits: Alien[] = []
@@ -75,7 +113,7 @@ function SpaceInvaders() {
 
           const hit = currentAliens.find(
             (a) =>
-              a.alive &&
+              !a.hidden &&
               !hits.includes(a) &&
               Math.abs(a.x - bullet.x) < HIT_RADIUS &&
               Math.abs(a.y - y) < HIT_RADIUS,
@@ -90,10 +128,8 @@ function SpaceInvaders() {
         setBullets(nextBullets)
         if (hits.length > 0) {
           const hitIds = new Set(hits.map((a) => a.id))
-          setAliens(
-            currentAliens.map((a) =>
-              hitIds.has(a.id) ? { ...a, alive: false } : a,
-            ),
+          setAliens((prev) =>
+            prev.map((a) => (hitIds.has(a.id) ? { ...a, hidden: true } : a)),
           )
           setExplosions((prev) => [
             ...prev,
@@ -105,6 +141,17 @@ function SpaceInvaders() {
             })),
           ])
           if (soundOnRef.current) playExplosion()
+
+          const t = setTimeout(() => {
+            setAliens((prev) =>
+              prev.map((a) =>
+                hitIds.has(a.id)
+                  ? { ...a, x: randomX(), y: -8, color: randomColor(), hidden: false }
+                  : a,
+              ),
+            )
+          }, RESPAWN_DELAY_MS)
+          respawnTimeouts.current.push(t)
         }
       }
 
@@ -114,14 +161,6 @@ function SpaceInvaders() {
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [])
-
-  // New wave after the current one is fully cleared.
-  useEffect(() => {
-    if (aliens.length > 0 && aliens.every((a) => !a.alive)) {
-      const t = setTimeout(() => setAliens(makeWave()), 1500)
-      return () => clearTimeout(t)
-    }
-  }, [aliens])
 
   // Auto-fire from the ship's current x, no click required.
   useEffect(() => {
@@ -159,17 +198,17 @@ function SpaceInvaders() {
       <button
         type="button"
         onClick={toggleSound}
-        className="pointer-events-auto font-pixel absolute top-20 right-2 text-[9px] text-slate-600 transition-colors hover:text-cyan"
+        className="pointer-events-auto font-pixel absolute top-20 right-4 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-cyan transition-colors hover:border-cyan"
       >
         ♪ SOUND: {soundOn ? 'ON' : 'OFF'}
       </button>
-      <p className="font-pixel absolute top-20 left-2 text-[9px] text-slate-600">
+      <p className="font-pixel absolute top-20 left-4 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-yellow">
         ▸ MOVE TO STEER
       </p>
 
       {aliens.map(
         (a) =>
-          a.alive && (
+          !a.hidden && (
             <PixelSprite
               key={a.id}
               rows={ALIEN_PATTERN}
