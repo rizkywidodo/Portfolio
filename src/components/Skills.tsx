@@ -1,64 +1,73 @@
-type SkillGroup = {
-  category: string
-  color: string
-  items: string[]
-}
+import { useState } from 'react'
 
-const skillGroups: SkillGroup[] = [
-  {
-    category: 'Frontend',
-    color: 'text-cyan',
-    items: ['React', 'TypeScript', 'Vite', 'HTML', 'CSS', 'JavaScript'],
-  },
-  {
-    category: 'Backend & DB',
-    color: 'text-pink',
-    items: ['Supabase (PostgreSQL)', 'Flask', 'Python', 'SQL'],
-  },
-  {
-    category: 'DevOps & Tools',
-    color: 'text-yellow',
-    items: ['Vercel', 'Cloudflare', 'Git/GitHub', 'SMTP (Brevo)'],
-  },
-  {
-    category: 'Product',
-    color: 'text-green',
-    items: ['PRD/BRD Writing', 'Figma', 'Microsoft Forms', 'Excel'],
-  },
+const coreStack = ['React', 'TypeScript', 'Supabase', 'Vite', 'PRD/BRD Writing']
+
+const alsoWorkedWith = [
+  'HTML',
+  'CSS',
+  'JavaScript',
+  'Python',
+  'Flask',
+  'SQL',
+  'Vercel',
+  'Git/GitHub',
+  'Figma',
+  'Cloudflare',
+  'SMTP (Brevo)',
 ]
 
-function SkillCard({ group }: { group: SkillGroup }) {
-  return (
-    <div className="w-72 shrink-0 border-4 border-border bg-panel p-6">
-      <h3
-        className={`font-pixel text-[11px] tracking-wide ${group.color}`}
-      >
-        {group.category}
-      </h3>
-      <ul className="mt-4 flex flex-wrap gap-2">
-        {group.items.map((item) => (
-          <li
-            key={item}
-            className="border-2 border-border px-3 py-1 text-[11px] text-slate-400"
-          >
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+const SECONDS_PER_ITEM = 2.2
 
 function Skills() {
+  const [paused, setPaused] = useState(false)
+  const duration = alsoWorkedWith.length * 2 * SECONDS_PER_ITEM
+
   return (
     <section id="skills" className="border-t-4 border-border">
       <div className="mx-auto max-w-5xl px-6 pt-24 pb-16">
         <h2 className="font-pixel text-xl text-cyan">// SKILLS</h2>
 
-        <div className="mt-10 flex flex-wrap gap-6">
-          {skillGroups.map((group) => (
-            <SkillCard key={group.category} group={group} />
+        <p className="font-pixel mt-10 text-[10px] tracking-widest text-slate-500">
+          CORE STACK
+        </p>
+        <div className="mt-4 flex flex-wrap gap-4">
+          {coreStack.map((skill) => (
+            <span
+              key={skill}
+              className="font-pixel border-4 border-cyan bg-panel px-5 py-3 text-[12px] tracking-wide text-cyan shadow-[0_0_18px_rgba(46,230,255,0.35)]"
+            >
+              {skill.toUpperCase()}
+            </span>
           ))}
+        </div>
+
+        <p className="font-pixel mt-10 text-[10px] tracking-widest text-slate-500">
+          ALSO WORKED WITH
+        </p>
+        <div
+          className="relative mt-4 overflow-hidden mask-[linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          <div
+            className="flex w-max items-center gap-3 whitespace-nowrap"
+            style={{
+              animationName: 'marquee-left',
+              animationDuration: `${duration}s`,
+              animationTimingFunction: 'linear',
+              animationIterationCount: 'infinite',
+              animationPlayState: paused ? 'paused' : 'running',
+            }}
+          >
+            {[...alsoWorkedWith, ...alsoWorkedWith].map((skill, i) => (
+              <span
+                key={i}
+                className="font-pixel border-2 border-border px-3 py-1.5 text-[10px] tracking-wide text-slate-400"
+              >
+                {skill.toUpperCase()}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>
