@@ -32,6 +32,17 @@
   }
 }
 
+@keyframes pixel-explode {
+  from {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
 * {
   image-rendering: pixelated;
 }

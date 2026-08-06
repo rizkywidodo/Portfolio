@@ -17,7 +17,7 @@ function Hero() {
     >
       <HeroBackground />
 
-      <div className="pointer-events-none mx-auto max-w-5xl">
+      <div className="pointer-events-none relative z-10 mx-auto max-w-5xl">
         <p className="font-pixel text-[11px] tracking-widest text-yellow">
           &gt; INFORMATICS ENGINEERING GRAD, ITS 2025
         </p>
