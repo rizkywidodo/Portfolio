@@ -1,12 +1,10 @@
-import { useState } from 'react'
-
 type SkillGroup = {
   category: string
   color: string
   items: string[]
 }
 
-const topRow: SkillGroup[] = [
+const skillGroups: SkillGroup[] = [
   {
     category: 'Frontend',
     color: 'text-cyan',
@@ -22,22 +20,12 @@ const topRow: SkillGroup[] = [
     color: 'text-yellow',
     items: ['Vercel', 'Cloudflare', 'Git/GitHub', 'SMTP (Brevo)'],
   },
-]
-
-const bottomRow: SkillGroup[] = [
   {
     category: 'Product',
     color: 'text-green',
     items: ['PRD/BRD Writing', 'Figma', 'Microsoft Forms', 'Excel'],
   },
-  {
-    category: 'CMS',
-    color: 'text-cyan',
-    items: ['WordPress', 'Elementor'],
-  },
 ]
-
-const SECONDS_PER_CARD = 7
 
 function SkillCard({ group }: { group: SkillGroup }) {
   return (
@@ -61,49 +49,16 @@ function SkillCard({ group }: { group: SkillGroup }) {
   )
 }
 
-function MarqueeRow({
-  groups,
-  direction,
-}: {
-  groups: SkillGroup[]
-  direction: 'left' | 'right'
-}) {
-  const [paused, setPaused] = useState(false)
-  // *2 for the duplicated content, so speed (not just duration) stays
-  // consistent regardless of how many cards are in a given row.
-  const duration = groups.length * 2 * SECONDS_PER_CARD
-
-  return (
-    <div className="overflow-hidden">
-      <div
-        className="flex w-max gap-6"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        style={{
-          animationName: `marquee-${direction}`,
-          animationDuration: `${duration}s`,
-          animationTimingFunction: 'linear',
-          animationIterationCount: 'infinite',
-          animationPlayState: paused ? 'paused' : 'running',
-        }}
-      >
-        {[...groups, ...groups].map((group, i) => (
-          <SkillCard key={`${group.category}-${i}`} group={group} />
-        ))}
-      </div>
-    </div>
-  )
-}
-
 function Skills() {
   return (
     <section id="skills" className="border-t-4 border-border">
       <div className="mx-auto max-w-5xl px-6 pt-24 pb-16">
         <h2 className="font-pixel text-xl text-cyan">// SKILLS</h2>
 
-        <div className="mt-10 space-y-6">
-          <MarqueeRow groups={topRow} direction="left" />
-          <MarqueeRow groups={bottomRow} direction="right" />
+        <div className="mt-10 flex flex-wrap gap-6">
+          {skillGroups.map((group) => (
+            <SkillCard key={group.category} group={group} />
+          ))}
         </div>
       </div>
     </section>
