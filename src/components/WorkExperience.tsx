@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import PixelSnake from './PixelSnake'
 
 const jobs = [
   {
@@ -23,7 +24,11 @@ function WorkExperience() {
       <div className="mx-auto max-w-5xl px-6 py-24">
         <h2 className="font-pixel text-xl text-cyan">// WORK EXPERIENCE</h2>
 
-        <div className="mt-10 space-y-8">
+        <div className="mt-8">
+          <PixelSnake />
+        </div>
+
+        <div className="mt-2 space-y-8">
           {jobs.map((job) => (
             <article
               key={job.company}

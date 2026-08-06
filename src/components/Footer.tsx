@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import FooterSnake from './FooterSnake'
 
 function formatUptime(ms: number) {
   const totalSeconds = Math.floor(ms / 1000)
@@ -22,7 +21,6 @@ function Footer() {
 
   return (
     <footer className="border-t-4 border-border px-6 py-8 text-center font-pixel text-[10px] text-slate-600">
-      <FooterSnake />
       <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
         <span className="inline-flex items-center gap-1.5 text-green">
           <span className="animate-blink h-1.5 w-1.5 bg-green" />
