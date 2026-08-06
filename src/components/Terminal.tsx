@@ -81,46 +81,54 @@ function Terminal() {
   }
 
   return (
-    <section id="terminal" className="mx-auto max-w-5xl px-6 py-24">
-      <h2 className="font-pixel text-xl text-cyan">// TERMINAL</h2>
-      <p className="mt-4 max-w-xl text-sm text-slate-400">
-        Try it — type a command below.
-      </p>
+    <section id="terminal" className="border-t-4 border-border">
+      <div className="mx-auto max-w-5xl px-6 pt-16 pb-24">
+        <h2 className="font-pixel text-xl text-cyan">// TERMINAL</h2>
+        <p className="mt-4 max-w-xl text-sm text-slate-400">
+          Try it — type a command below.{' '}
+          <span className="text-slate-500">
+            (psst — try 'whoami' or 'help')
+          </span>
+        </p>
 
-      <div
-        className="mt-10 border-4 border-border bg-panel p-6 text-sm"
-        onClick={() => inputRef.current?.focus()}
-      >
-        <div ref={scrollRef} className="max-h-80 space-y-3 overflow-y-auto">
-          {history.map((line, i) => (
-            <div key={i}>
-              {line.command !== undefined && (
-                <p className="text-cyan">
-                  <span className="text-green">guest@rizky</span>
-                  <span className="text-slate-500">:~$</span> {line.command}
-                </p>
-              )}
-              {line.output.map((text, j) => (
-                <p key={j} className="text-slate-400">
-                  {text}
-                </p>
-              ))}
-            </div>
-          ))}
+        <div
+          className="mt-10 border-4 border-border bg-panel p-6 text-sm"
+          onClick={() => inputRef.current?.focus()}
+        >
+          <div ref={scrollRef} className="max-h-80 space-y-3 overflow-y-auto">
+            {history.map((line, i) => (
+              <div key={i}>
+                {line.command !== undefined && (
+                  <p className="text-cyan">
+                    <span className="text-green">guest@rizky</span>
+                    <span className="text-slate-500">:~$</span> {line.command}
+                  </p>
+                )}
+                {line.output.map((text, j) => (
+                  <p key={j} className="text-slate-400">
+                    {text}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <form
+            onSubmit={handleSubmit}
+            className="mt-3 flex items-center gap-2"
+          >
+            <span className="text-green">guest@rizky</span>
+            <span className="text-slate-500">:~$</span>
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+              className="flex-1 bg-transparent text-cyan caret-cyan outline-none"
+            />
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit} className="mt-3 flex items-center gap-2">
-          <span className="text-green">guest@rizky</span>
-          <span className="text-slate-500">:~$</span>
-          <input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-            className="flex-1 bg-transparent text-cyan caret-cyan outline-none"
-          />
-        </form>
       </div>
     </section>
   )
