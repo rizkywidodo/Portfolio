@@ -17,7 +17,7 @@ const projects: Project[] = [
     problem:
       '13 stations, one Google Form. No real-time visibility into what was already booked, so double-bookings and manual back-and-forth were routine — nobody had a clean way to track requests at scale.',
     solution:
-      'A full-CRUD booking platform with role-based access (super admin, planner, area authority) and automatic email confirmations — so nobody has to ask "did this get approved?" anymore.',
+      'A full-CRUD booking platform with role-based access (super admin, planner, area authority) and automatic email confirmations via Brevo SMTP — booking requests trigger instant email notifications, so nobody has to manually follow up or ask "did this get approved?" anymore.',
     impact: 'Live across all 13 stations, fully replacing manual coordination.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Vercel', 'Brevo SMTP'],
   },
@@ -25,11 +25,12 @@ const projects: Project[] = [
     title: 'Bank Data Station Dashboard',
     org: 'MRT Jakarta',
     problem:
-      'Daily Safety/Service/Security reports came in through Google Forms, but analysis was stuck in Excel Online — slow, hard to filter, and impossible to spot patterns across 4 stations without hours of manual scrolling.',
+      'I was tasked with building a dashboard for daily Safety/Service/Security reports — but stuck with Excel Online/Sheets as the tool, it was laggy, rigid, and painful to filter across 4 stations.',
     solution:
-      'Built a pipeline that turns the raw form export into a live, filterable dashboard — real-time stats, category breakdowns, per-station trends, and drill-down into individual reports with photo attachments.',
-    impact: 'Reports that used to take a wait now update the moment you upload.',
-    stack: ['React', 'TypeScript', 'Supabase', 'Cloudflare'],
+      'I proposed building a real web app instead — a pipeline that turns the raw form export into a live, filterable dashboard: real-time stats, category breakdowns, per-station trends, and drill-down into individual reports with photo attachments.',
+    impact:
+      'Now used daily to analyze complaints and findings across stations — reports that used to take a wait now update the moment you upload.',
+    stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Cloudflare'],
   },
   {
     title: 'Station Digitalization Proposal',
@@ -40,7 +41,7 @@ const projects: Project[] = [
       'Wrote the BRD and PRD, designed Figma mockups, then went further: built an actual working prototype instead of stopping at static designs.',
     impact:
       'The pitch came with a demo people could try themselves, not just a promise on paper.',
-    stack: ['Figma', 'PRD/BRD', 'React'],
+    stack: ['Figma', 'PRD/BRD', 'React', 'Vite'],
   },
 ]
 
