@@ -1,62 +1,70 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
-import PixelStar from './PixelStar'
+import { useEffect, useState } from 'react'
+import PixelSprite from './PixelSprite'
+import SpaceInvaders from './SpaceInvaders'
+import { PLANET_PATTERN, planetColors } from './pixelSprites'
 
-// Heavy (three.js) — only fetched when actually rendered, so mobile /
-// reduced-motion visitors never pay for this bundle.
-const HeroScene = lazy(() => import('./HeroScene'))
+const stars = [
+  { x: 6, y: 10 }, { x: 14, y: 28 }, { x: 22, y: 6 }, { x: 30, y: 45 },
+  { x: 9, y: 60 }, { x: 38, y: 15 }, { x: 45, y: 55 }, { x: 4, y: 80 },
+  { x: 58, y: 8 }, { x: 66, y: 30 }, { x: 74, y: 60 }, { x: 82, y: 12 },
+  { x: 90, y: 45 }, { x: 96, y: 70 }, { x: 50, y: 85 }, { x: 26, y: 90 },
+  { x: 70, y: 88 }, { x: 12, y: 40 },
+]
 
-function useCanRender3D() {
-  const [canRender, setCanRender] = useState(false)
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
-    const isDesktop = window.matchMedia('(min-width: 768px)').matches
-    setCanRender(!reducedMotion && isDesktop)
+    setIsDesktop(window.matchMedia('(min-width: 1024px)').matches)
   }, [])
 
-  return canRender
+  return isDesktop
 }
 
 function HeroBackground() {
-  const canRender3D = useCanRender3D()
+  // On narrow screens the Hero text wraps to full width, leaving no
+  // clear space for the alien battlefield / planets, so the whole scene
+  // (beyond a plain ambient glow) is desktop/tablet only.
+  const isDesktop = useIsDesktop()
 
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      {/* Soft ambient light wash behind the gem — kept blurred since this
-          reads as lighting, not pixel art, so it doesn't fight the crisp
-          pixel elements. */}
-      <div className="absolute top-24 -right-16 h-72 w-72 rounded-full bg-cyan/20 blur-3xl" />
+      <div className="absolute top-24 -right-16 h-72 w-72 rounded-full bg-cyan/10 blur-3xl" />
 
-      <PixelStar
-        color="pink"
-        size={10}
-        className="absolute top-32 left-[8%] [animation-delay:-1s]"
-      />
-      <PixelStar
-        color="yellow"
-        size={8}
-        className="absolute top-[55%] left-[20%] [animation-delay:-3s]"
-      />
-      <PixelStar
-        color="cyan"
-        size={10}
-        className="absolute top-[20%] left-[55%] [animation-delay:-2s]"
-      />
-      <PixelStar
-        color="pink"
-        size={8}
-        className="absolute top-[70%] left-[45%] [animation-delay:-4s]"
-      />
+      {isDesktop && (
+        <>
+          {stars.map((star, i) => (
+            <span
+              key={i}
+              className="animate-blink absolute h-0.75 w-0.75 bg-slate-300"
+              style={{
+                left: `${star.x}%`,
+                top: `${star.y}%`,
+                animationDelay: `${(i % 6) * 0.3}s`,
+              }}
+            />
+          ))}
 
-      {canRender3D && (
-        <Suspense fallback={null}>
-          <HeroScene />
-        </Suspense>
+          <PixelSprite
+            rows={PLANET_PATTERN}
+            colorMap={planetColors('#4a7dff', '#26418f')}
+            pixelSize={4}
+            className="animate-float absolute opacity-70"
+            style={{ left: '4%', top: '6%' }}
+          />
+          <PixelSprite
+            rows={PLANET_PATTERN}
+            colorMap={planetColors('#ff4fd8', '#a01e8a')}
+            pixelSize={3}
+            className="animate-float absolute opacity-60 [animation-delay:-3s]"
+            style={{ left: '2%', top: '85%' }}
+          />
+
+          <SpaceInvaders />
+        </>
       )}
     </div>
   )

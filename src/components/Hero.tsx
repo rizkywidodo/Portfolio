@@ -17,11 +17,11 @@ function Hero() {
     >
       <HeroBackground />
 
-      <div className="mx-auto max-w-5xl">
+      <div className="pointer-events-none mx-auto max-w-5xl">
         <p className="font-pixel text-[11px] tracking-widest text-yellow">
           &gt; INFORMATICS ENGINEERING GRAD, ITS 2025
         </p>
-        <h1 className="font-pixel mt-6 text-3xl leading-[1.6] text-cyan md:text-5xl">
+        <h1 className="font-pixel mt-6 text-3xl leading-[1.6] text-cyan md:text-4xl lg:text-5xl">
           Muhammad
           <br />
           Rizky Widodo
@@ -34,7 +34,7 @@ function Hero() {
           and banking (BRI).
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-4">
+        <div className="pointer-events-auto mt-8 flex flex-wrap gap-4">
           <Link
             to="/projects"
             className="font-pixel border-4 border-cyan bg-cyan px-5 py-3 text-[11px] text-bg shadow-[4px_4px_0_0_#131829] transition-transform hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#131829]"
