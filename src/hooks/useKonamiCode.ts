@@ -22,6 +22,7 @@ export function useKonamiCode(onActivate: () => void) {
       const expected = SEQUENCE[position.current]
 
       if (key === expected) {
+        e.preventDefault()
         position.current += 1
         if (position.current === SEQUENCE.length) {
           position.current = 0

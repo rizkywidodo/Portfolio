@@ -24,6 +24,22 @@ export const ALIEN_PATTERN = [
   '..AA..AA..',
 ]
 
+export const BOSS_PATTERN = [
+  '...BBBBB...',
+  '..BBBBBBB..',
+  '.BEBBBBBEB.',
+  'BBBBBBBBBBB',
+  'BB.BBBBB.BB',
+  'BBBB.B.BBBB',
+  '.BB.....BB.',
+  '..B.....B..',
+]
+
+export const BOSS_COLORS: Record<string, string> = {
+  B: '#ff2b6d',
+  E: '#ffe14d',
+}
+
 export const PLANET_PATTERN = [
   '...PPP...',
   '..PPPPP..',

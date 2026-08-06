@@ -32,15 +32,6 @@
   }
 }
 
-@keyframes pixel-rainbow {
-  from {
-    filter: hue-rotate(0deg) saturate(1.6);
-  }
-  to {
-    filter: hue-rotate(360deg) saturate(1.6);
-  }
-}
-
 @keyframes marquee-left {
   from {
     transform: translateX(0);

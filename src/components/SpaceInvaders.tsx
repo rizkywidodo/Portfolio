@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import PixelSprite from './PixelSprite'
-import { ALIEN_PATTERN, SHIP_COLORS, SHIP_PATTERN } from './pixelSprites'
+import {
+  ALIEN_PATTERN,
+  BOSS_COLORS,
+  BOSS_PATTERN,
+  SHIP_COLORS,
+  SHIP_PATTERN,
+} from './pixelSprites'
 import { playExplosion, playShoot, unlockAudio } from '../lib/sound'
-import { KONAMI_EVENT } from './KonamiEasterEgg'
+import { BOSS_DEFEATED_EVENT, KONAMI_EVENT } from './KonamiEasterEgg'
 
 type Alien = {
   id: string
@@ -25,7 +31,13 @@ const FIRE_INTERVAL_MS = 450
 const PARTICLE_ANGLES = [0, 60, 120, 180, 240, 300]
 const POINTS_PER_HIT = 10
 const HIGH_SCORE_KEY = 'invaders-high-score'
-const RAINBOW_DURATION_MS = 6000
+const BOSS_MAX_HP = 25
+const BOSS_HIT_RADIUS = 13 // percent, bigger target than a regular alien
+const BOSS_Y = 22 // percent, fixed height — the boss doesn't descend
+const BOSS_SWAY_SPEED = 45 // lower = faster left-right sway
+const BOSS_SWAY_RANGE = 28 // percent either side of center
+const BOSS_DEFEAT_BONUS = 500
+const CONFETTI_COUNT = 16
 
 const randomColor = () =>
   ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)]
@@ -50,15 +62,20 @@ function SpaceInvaders() {
   const [aliens, setAliens] = useState<Alien[]>(() => makePool())
   const [bullets, setBullets] = useState<Bullet[]>([])
   const [explosions, setExplosions] = useState<Explosion[]>([])
-  const [soundOn, setSoundOn] = useState(true)
+  const [playing, setPlaying] = useState(false)
   const [score, setScore] = useState(0)
   const [highScore, setHighScore] = useState(0)
-  const [rainbow, setRainbow] = useState(false)
+  const [bossActive, setBossActive] = useState(false)
+  const [bossHp, setBossHp] = useState(BOSS_MAX_HP)
+  const [bossX, setBossX] = useState(50)
 
   const aliensRef = useRef(aliens)
   const bulletsRef = useRef(bullets)
   const shipXRef = useRef(shipX)
-  const soundOnRef = useRef(soundOn)
+  const playingRef = useRef(playing)
+  const bossActiveRef = useRef(bossActive)
+  const bossHpRef = useRef(bossHp)
+  const bossXRef = useRef(bossX)
   const frameRef = useRef(0)
   const respawnTimeouts = useRef<ReturnType<typeof setTimeout>[]>([])
 
@@ -69,17 +86,8 @@ function SpaceInvaders() {
     bulletsRef.current = bullets
   }, [bullets])
   useEffect(() => {
-    soundOnRef.current = soundOn
-  }, [soundOn])
-
-  // First real click anywhere on the page satisfies the browser's
-  // autoplay-gesture requirement, so sound-on-by-default actually works
-  // once the visitor interacts at all (not just with this widget).
-  useEffect(() => {
-    const unlock = () => unlockAudio()
-    window.addEventListener('pointerdown', unlock, { once: true })
-    return () => window.removeEventListener('pointerdown', unlock)
-  }, [])
+    playingRef.current = playing
+  }, [playing])
 
   useEffect(() => {
     return () => {
@@ -92,10 +100,18 @@ function SpaceInvaders() {
     if (Number.isFinite(stored)) setHighScore(stored)
   }, [])
 
+  // Konami code spawns a boss instead of just a color effect — reusing
+  // the existing bullet/explosion machinery for a real mini boss fight.
   useEffect(() => {
     const handleKonami = () => {
-      setRainbow(true)
-      window.setTimeout(() => setRainbow(false), RAINBOW_DURATION_MS)
+      if (bossActiveRef.current) return
+      bossHpRef.current = BOSS_MAX_HP
+      setBossHp(BOSS_MAX_HP)
+      bossActiveRef.current = true
+      setBossActive(true)
+      playingRef.current = true
+      setPlaying(true)
+      unlockAudio()
     }
     window.addEventListener(KONAMI_EVENT, handleKonami)
     return () => window.removeEventListener(KONAMI_EVENT, handleKonami)
@@ -124,13 +140,33 @@ function SpaceInvaders() {
         setAliens(currentAliens)
       }
 
+      const bossFight = bossActiveRef.current
+      if (bossFight) {
+        const bx = 50 + Math.sin(frameRef.current / BOSS_SWAY_SPEED) * BOSS_SWAY_RANGE
+        bossXRef.current = bx
+        setBossX(bx)
+      }
+
       if (currentBullets.length > 0) {
         const hits: Alien[] = []
         const nextBullets: Bullet[] = []
+        let bossHitCount = 0
 
         for (const bullet of currentBullets) {
           const y = bullet.y - BULLET_SPEED
           if (y < 0) continue
+
+          if (bossFight) {
+            if (
+              Math.abs(bossXRef.current - bullet.x) < BOSS_HIT_RADIUS &&
+              Math.abs(BOSS_Y - y) < BOSS_HIT_RADIUS
+            ) {
+              bossHitCount += 1
+              continue
+            }
+            nextBullets.push({ ...bullet, y })
+            continue
+          }
 
           const hit = currentAliens.find(
             (a) =>
@@ -147,7 +183,46 @@ function SpaceInvaders() {
         }
 
         setBullets(nextBullets)
-        if (hits.length > 0) {
+
+        if (bossFight && bossHitCount > 0) {
+          const nextHp = Math.max(0, bossHpRef.current - bossHitCount)
+          bossHpRef.current = nextHp
+          setBossHp(nextHp)
+          if (playingRef.current) playExplosion()
+          setExplosions((prev) => [
+            ...prev,
+            {
+              id: `boss-hit-${Date.now()}`,
+              x: bossXRef.current,
+              y: BOSS_Y,
+              color: '#ff2b6d',
+            },
+          ])
+
+          if (nextHp <= 0) {
+            bossActiveRef.current = false
+            setBossActive(false)
+            setExplosions((prev) => [
+              ...prev,
+              ...Array.from({ length: CONFETTI_COUNT }, (_, i) => ({
+                id: `confetti-${i}-${Date.now()}`,
+                x: 15 + Math.random() * 70,
+                y: 10 + Math.random() * 45,
+                color: randomColor(),
+              })),
+            ])
+            setScore((prev) => {
+              const next = prev + BOSS_DEFEAT_BONUS
+              setHighScore((prevHigh) => {
+                if (next <= prevHigh) return prevHigh
+                localStorage.setItem(HIGH_SCORE_KEY, String(next))
+                return next
+              })
+              return next
+            })
+            window.dispatchEvent(new Event(BOSS_DEFEATED_EVENT))
+          }
+        } else if (hits.length > 0) {
           const hitIds = new Set(hits.map((a) => a.id))
           setAliens((prev) =>
             prev.map((a) => (hitIds.has(a.id) ? { ...a, hidden: true } : a)),
@@ -161,7 +236,7 @@ function SpaceInvaders() {
               color: a.color,
             })),
           ])
-          if (soundOnRef.current) playExplosion()
+          if (playingRef.current) playExplosion()
 
           setScore((prev) => {
             const next = prev + hits.length * POINTS_PER_HIT
@@ -193,19 +268,21 @@ function SpaceInvaders() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  // Auto-fire from the ship's current x, no click required.
+  // Auto-fire from the ship's current x, no click required — only while playing.
   useEffect(() => {
+    if (!playing) return
     const interval = setInterval(() => {
       setBullets((prev) => [
         ...prev,
         { id: `b${Date.now()}-${Math.random()}`, x: shipXRef.current, y: 84 },
       ])
-      if (soundOnRef.current) playShoot()
+      playShoot()
     }, FIRE_INTERVAL_MS)
     return () => clearInterval(interval)
-  }, [])
+  }, [playing])
 
   const handlePointerMove = (e: React.PointerEvent) => {
+    if (!playingRef.current) return
     const rect = battlefieldRef.current?.getBoundingClientRect()
     if (!rect) return
     const pct = clamp(((e.clientX - rect.left) / rect.width) * 100, 3, 97)
@@ -213,10 +290,12 @@ function SpaceInvaders() {
     setShipX(pct)
   }
 
-  const toggleSound = () => {
-    setSoundOn((prev) => {
-      if (!prev) unlockAudio()
-      return !prev
+  const togglePlaying = () => {
+    setPlaying((prev) => {
+      const next = !prev
+      if (next) unlockAudio()
+      else setBullets([])
+      return next
     })
   }
 
@@ -228,22 +307,24 @@ function SpaceInvaders() {
     >
       <button
         type="button"
-        onClick={toggleSound}
-        className="pointer-events-auto font-pixel absolute top-20 right-4 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-cyan transition-colors hover:border-cyan"
+        onClick={togglePlaying}
+        className={`pointer-events-auto font-pixel absolute top-20 right-4 border-2 px-2 py-1 text-[10px] transition-colors ${
+          playing
+            ? 'border-pink bg-panel/90 text-pink hover:border-cyan hover:text-cyan'
+            : 'border-cyan bg-panel/90 text-cyan hover:border-pink hover:text-pink'
+        }`}
       >
-        ♪ SOUND: {soundOn ? 'ON' : 'OFF'}
+        {playing ? '■ STOP' : '▶ PLAY'}
       </button>
       <p className="font-pixel absolute top-20 left-4 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-yellow">
-        ▸ MOVE TO STEER
+        {playing ? '▸ MOVE TO STEER' : '▸ PRESS PLAY TO DEFEND'}
       </p>
       <p className="font-pixel absolute top-20 left-1/2 -translate-x-1/2 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-green">
         SCORE {score} · HI {highScore}
       </p>
 
-      <div
-        style={rainbow ? { animation: 'pixel-rainbow 1s linear infinite' } : undefined}
-      >
-        {aliens.map(
+      {!bossActive &&
+        aliens.map(
           (a) =>
             !a.hidden && (
               <PixelSprite
@@ -256,7 +337,22 @@ function SpaceInvaders() {
               />
             ),
         )}
-      </div>
+
+      {bossActive && (
+        <div
+          className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2"
+          style={{ left: `${bossX}%`, top: `${BOSS_Y}%` }}
+        >
+          <p className="font-pixel text-[9px] text-pink">BOSS</p>
+          <div className="h-2 w-32 border-2 border-border bg-panel">
+            <div
+              className="h-full bg-pink transition-[width] duration-150"
+              style={{ width: `${(bossHp / BOSS_MAX_HP) * 100}%` }}
+            />
+          </div>
+          <PixelSprite rows={BOSS_PATTERN} colorMap={BOSS_COLORS} pixelSize={9} />
+        </div>
+      )}
 
       {explosions.map((ex) => (
         <div
@@ -297,13 +393,15 @@ function SpaceInvaders() {
         />
       ))}
 
-      <PixelSprite
-        rows={SHIP_PATTERN}
-        colorMap={SHIP_COLORS}
-        pixelSize={5}
-        className="absolute top-[86%] -translate-x-1/2"
-        style={{ left: `${shipX}%` }}
-      />
+      {playing && (
+        <PixelSprite
+          rows={SHIP_PATTERN}
+          colorMap={SHIP_COLORS}
+          pixelSize={5}
+          className="absolute top-[86%] -translate-x-1/2"
+          style={{ left: `${shipX}%` }}
+        />
+      )}
     </div>
   )
 }
