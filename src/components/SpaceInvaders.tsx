@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import PixelSprite from './PixelSprite'
 import { ALIEN_PATTERN, SHIP_COLORS, SHIP_PATTERN } from './pixelSprites'
 import { playExplosion, playShoot, unlockAudio } from '../lib/sound'
+import { KONAMI_EVENT } from './KonamiEasterEgg'
 
 type Alien = {
   id: string
@@ -22,6 +23,9 @@ const BULLET_SPEED = 2.4 // percent of battlefield height per frame
 const HIT_RADIUS = 6 // percent
 const FIRE_INTERVAL_MS = 450
 const PARTICLE_ANGLES = [0, 60, 120, 180, 240, 300]
+const POINTS_PER_HIT = 10
+const HIGH_SCORE_KEY = 'invaders-high-score'
+const RAINBOW_DURATION_MS = 6000
 
 const randomColor = () =>
   ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)]
@@ -47,6 +51,9 @@ function SpaceInvaders() {
   const [bullets, setBullets] = useState<Bullet[]>([])
   const [explosions, setExplosions] = useState<Explosion[]>([])
   const [soundOn, setSoundOn] = useState(true)
+  const [score, setScore] = useState(0)
+  const [highScore, setHighScore] = useState(0)
+  const [rainbow, setRainbow] = useState(false)
 
   const aliensRef = useRef(aliens)
   const bulletsRef = useRef(bullets)
@@ -78,6 +85,20 @@ function SpaceInvaders() {
     return () => {
       for (const t of respawnTimeouts.current) clearTimeout(t)
     }
+  }, [])
+
+  useEffect(() => {
+    const stored = Number(localStorage.getItem(HIGH_SCORE_KEY))
+    if (Number.isFinite(stored)) setHighScore(stored)
+  }, [])
+
+  useEffect(() => {
+    const handleKonami = () => {
+      setRainbow(true)
+      window.setTimeout(() => setRainbow(false), RAINBOW_DURATION_MS)
+    }
+    window.addEventListener(KONAMI_EVENT, handleKonami)
+    return () => window.removeEventListener(KONAMI_EVENT, handleKonami)
   }, [])
 
   // Single rAF loop: descends aliens, moves bullets up, and checks
@@ -142,6 +163,16 @@ function SpaceInvaders() {
           ])
           if (soundOnRef.current) playExplosion()
 
+          setScore((prev) => {
+            const next = prev + hits.length * POINTS_PER_HIT
+            setHighScore((prevHigh) => {
+              if (next <= prevHigh) return prevHigh
+              localStorage.setItem(HIGH_SCORE_KEY, String(next))
+              return next
+            })
+            return next
+          })
+
           const t = setTimeout(() => {
             setAliens((prev) =>
               prev.map((a) =>
@@ -205,20 +236,27 @@ function SpaceInvaders() {
       <p className="font-pixel absolute top-20 left-4 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-yellow">
         ▸ MOVE TO STEER
       </p>
+      <p className="font-pixel absolute top-20 left-1/2 -translate-x-1/2 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-green">
+        SCORE {score} · HI {highScore}
+      </p>
 
-      {aliens.map(
-        (a) =>
-          !a.hidden && (
-            <PixelSprite
-              key={a.id}
-              rows={ALIEN_PATTERN}
-              colorMap={{ A: a.color }}
-              pixelSize={4}
-              className="animate-float absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${a.x}%`, top: `${a.y}%` }}
-            />
-          ),
-      )}
+      <div
+        style={rainbow ? { animation: 'pixel-rainbow 1s linear infinite' } : undefined}
+      >
+        {aliens.map(
+          (a) =>
+            !a.hidden && (
+              <PixelSprite
+                key={a.id}
+                rows={ALIEN_PATTERN}
+                colorMap={{ A: a.color }}
+                pixelSize={4}
+                className="animate-float absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${a.x}%`, top: `${a.y}%` }}
+              />
+            ),
+        )}
+      </div>
 
       {explosions.map((ex) => (
         <div

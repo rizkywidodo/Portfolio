@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 const sectionLinks = [
   { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
+  { id: 'terminal', label: 'Terminal', hideOnMobile: true },
 ]
 
 function Navbar() {
@@ -24,9 +25,12 @@ function Navbar() {
         <Link to="/" className="font-pixel text-xs text-cyan">
           RW_
         </Link>
-        <ul className="flex items-center gap-6 font-pixel text-[10px] tracking-wide text-slate-400 uppercase">
+        <ul className="flex items-center gap-4 font-pixel text-[10px] tracking-wide text-slate-400 uppercase sm:gap-6">
           {sectionLinks.map((link) => (
-            <li key={link.id}>
+            <li
+              key={link.id}
+              className={link.hideOnMobile ? 'hidden sm:block' : undefined}
+            >
               <a
                 href={`/#${link.id}`}
                 onClick={goToSection(link.id)}

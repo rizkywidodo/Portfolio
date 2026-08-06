@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import KonamiEasterEgg from './components/KonamiEasterEgg'
 import Home from './pages/Home'
 import ProjectsPage from './pages/ProjectsPage'
 
@@ -19,6 +20,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <KonamiEasterEgg />
       <Navbar />
       <main>
         <Routes>

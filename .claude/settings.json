@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(curl -s *)",
+      "Bash(npx tsc -b --noEmit *)",
+      "Bash(npm audit *)",
+      "Bash(npm ls *)",
+      "Bash(npm view *)"
+    ]
+  }
+}

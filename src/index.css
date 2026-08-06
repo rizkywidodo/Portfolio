@@ -32,6 +32,15 @@
   }
 }
 
+@keyframes pixel-rainbow {
+  from {
+    filter: hue-rotate(0deg) saturate(1.6);
+  }
+  to {
+    filter: hue-rotate(360deg) saturate(1.6);
+  }
+}
+
 @keyframes pixel-explode {
   from {
     transform: translate(0, 0) scale(1);
