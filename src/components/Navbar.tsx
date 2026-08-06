@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 const sectionLinks = [
   { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
+  { id: 'work-experience', label: 'Work' },
   { id: 'terminal', label: 'Terminal', hideOnMobile: true },
 ]
 
