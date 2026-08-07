@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
 const CELL = 20
-const ROWS = 5
 const LENGTH = 10
 const TICK_MS = 140
 const TURN_CHANCE = 0.18
+const SNAKE_COUNT = 3
 
 type Dir = { dx: number; dy: number }
 type Cell = { x: number; y: number }
@@ -20,45 +20,41 @@ const VERTICAL: Dir[] = [
 
 const mod = (n: number, m: number) => ((n % m) + m) % m
 
-// Classic grid-locked Snake movement (right-angle turns only, wraps at the
-// edges) — wanders the empty strip forever instead of sliding across once.
-function PixelSnake() {
-  const trackRef = useRef<HTMLDivElement>(null)
-  const [segments, setSegments] = useState<Cell[]>([])
+function initialSegments(cols: number, rows: number, index: number): Cell[] {
+  const startY = mod(Math.floor((rows * (index + 1)) / (SNAKE_COUNT + 1)), rows)
+  const startX = mod(Math.floor(cols / 2) + index * 5, cols)
+  return Array.from({ length: LENGTH }, (_, i) => ({
+    x: mod(startX - i, cols),
+    y: startY,
+  }))
+}
 
-  const colsRef = useRef(0)
-  const dirRef = useRef<Dir>({ dx: 1, dy: 0 })
-  const segmentsRef = useRef<Cell[]>([])
-
+// One classic grid-locked Snake (right-angle turns only, wraps at the
+// edges), sized to whatever arena its parent gives it.
+function Snake({
+  cols,
+  rows,
+  index,
+}: {
+  cols: number
+  rows: number
+  index: number
+}) {
+  const colsRef = useRef(cols)
+  const rowsRef = useRef(rows)
   useEffect(() => {
-    const el = trackRef.current
-    if (!el) return
+    colsRef.current = cols
+    rowsRef.current = rows
+  }, [cols, rows])
 
-    const measure = () => {
-      const cols = Math.max(10, Math.floor(el.clientWidth / CELL))
-      colsRef.current = cols
-      if (segmentsRef.current.length === 0) {
-        const startY = Math.floor(ROWS / 2)
-        const startX = Math.floor(cols / 2)
-        const initial = Array.from({ length: LENGTH }, (_, i) => ({
-          x: mod(startX - i, cols),
-          y: startY,
-        }))
-        segmentsRef.current = initial
-        setSegments(initial)
-      }
-    }
-
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+  const dirRef = useRef<Dir>({ dx: 1, dy: 0 })
+  const segmentsRef = useRef<Cell[]>(initialSegments(cols, rows, index))
+  const [segments, setSegments] = useState<Cell[]>(segmentsRef.current)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const cols = colsRef.current
-      if (cols === 0) return
+      const c = colsRef.current
+      const r = rowsRef.current
 
       if (Math.random() < TURN_CHANCE) {
         const horizontal = dirRef.current.dx !== 0
@@ -68,7 +64,7 @@ function PixelSnake() {
 
       const head = segmentsRef.current[0]
       const { dx, dy } = dirRef.current
-      const nextHead = { x: mod(head.x + dx, cols), y: mod(head.y + dy, ROWS) }
+      const nextHead = { x: mod(head.x + dx, c), y: mod(head.y + dy, r) }
       const nextSegments = [nextHead, ...segmentsRef.current.slice(0, LENGTH - 1)]
       segmentsRef.current = nextSegments
       setSegments(nextSegments)
@@ -77,12 +73,7 @@ function PixelSnake() {
   }, [])
 
   return (
-    <div
-      ref={trackRef}
-      className="relative mb-8 w-full overflow-hidden"
-      style={{ height: ROWS * CELL }}
-      aria-hidden="true"
-    >
+    <>
       {segments.map((seg, i) => {
         const isHead = i === 0
         return (
@@ -106,6 +97,43 @@ function PixelSnake() {
           </span>
         )
       })}
+    </>
+  )
+}
+
+function PixelSnake() {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState({ cols: 0, rows: 0 })
+
+  useEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+
+    const measure = () => {
+      const cols = Math.max(10, Math.floor(el.clientWidth / CELL))
+      const rows = Math.max(10, Math.floor(el.clientHeight / CELL))
+      setSize((prev) =>
+        prev.cols === cols && prev.rows === rows ? prev : { cols, rows },
+      )
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={trackRef}
+      className="pointer-events-none absolute inset-0"
+      aria-hidden="true"
+    >
+      {size.cols > 0 &&
+        size.rows > 0 &&
+        Array.from({ length: SNAKE_COUNT }, (_, i) => (
+          <Snake key={i} cols={size.cols} rows={size.rows} index={i} />
+        ))}
     </div>
   )
 }

@@ -132,7 +132,7 @@ function SpaceInvaders() {
         currentAliens = currentAliens.map((a) => {
           if (a.hidden) return a
           const y = a.y + DESCEND_PER_TICK
-          return y > 78
+          return y > 90
             ? { ...a, x: randomX(), y: -8, color: randomColor() }
             : { ...a, y }
         })
@@ -274,7 +274,7 @@ function SpaceInvaders() {
     const interval = setInterval(() => {
       setBullets((prev) => [
         ...prev,
-        { id: `b${Date.now()}-${Math.random()}`, x: shipXRef.current, y: 84 },
+        { id: `b${Date.now()}-${Math.random()}`, x: shipXRef.current, y: 90 },
       ])
       playShoot()
     }, FIRE_INTERVAL_MS)
@@ -303,25 +303,27 @@ function SpaceInvaders() {
     <div
       ref={battlefieldRef}
       onPointerMove={handlePointerMove}
-      className="pointer-events-auto absolute inset-0 touch-none select-none"
+      className="pointer-events-auto absolute inset-0 touch-pan-y select-none"
     >
-      <button
-        type="button"
-        onClick={togglePlaying}
-        className={`pointer-events-auto font-pixel absolute top-20 right-4 border-2 px-2 py-1 text-[10px] transition-colors ${
-          playing
-            ? 'border-pink bg-panel/90 text-pink hover:border-cyan hover:text-cyan'
-            : 'border-cyan bg-panel/90 text-cyan hover:border-pink hover:text-pink'
-        }`}
-      >
-        {playing ? '■ STOP' : '▶ PLAY'}
-      </button>
-      <p className="font-pixel absolute top-20 left-4 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-yellow">
-        {playing ? '▸ MOVE TO STEER' : '▸ PRESS PLAY TO DEFEND'}
-      </p>
-      <p className="font-pixel absolute top-20 left-1/2 -translate-x-1/2 border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-green">
-        SCORE {score} · HI {highScore}
-      </p>
+      <div className="pointer-events-none absolute inset-x-4 top-24 grid grid-cols-3 items-center">
+        <p className="font-pixel justify-self-start border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-yellow">
+          {playing ? '▸ MOVE TO STEER' : '▸ PRESS PLAY TO DEFEND'}
+        </p>
+        <p className="font-pixel justify-self-center border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-green">
+          SCORE {score} · HI {highScore}
+        </p>
+        <button
+          type="button"
+          onClick={togglePlaying}
+          className={`pointer-events-auto font-pixel justify-self-end border-2 px-2 py-1 text-[10px] transition-colors ${
+            playing
+              ? 'border-pink bg-panel/90 text-pink hover:border-cyan hover:text-cyan'
+              : 'border-cyan bg-panel/90 text-cyan hover:border-pink hover:text-pink'
+          }`}
+        >
+          {playing ? '■ STOP' : '▶ PLAY'}
+        </button>
+      </div>
 
       {!bossActive &&
         aliens.map(
@@ -398,8 +400,8 @@ function SpaceInvaders() {
           rows={SHIP_PATTERN}
           colorMap={SHIP_COLORS}
           pixelSize={5}
-          className="absolute top-[86%] -translate-x-1/2"
-          style={{ left: `${shipX}%` }}
+          className="absolute -translate-x-1/2"
+          style={{ left: `${shipX}%`, top: 'calc(100% - 100px)' }}
         />
       )}
     </div>

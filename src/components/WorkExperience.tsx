@@ -20,15 +20,16 @@ const jobs = [
 
 function WorkExperience() {
   return (
-    <section id="work-experience" className="border-t-4 border-border">
-      <div className="mx-auto max-w-5xl px-6 py-24">
+    <section
+      id="work-experience"
+      className="relative overflow-hidden border-t-4 border-border"
+    >
+      <PixelSnake />
+
+      <div className="relative z-10 mx-auto max-w-5xl px-6 py-16 lg:py-24">
         <h2 className="font-pixel text-xl text-cyan">// WORK EXPERIENCE</h2>
 
-        <div className="mt-8">
-          <PixelSnake />
-        </div>
-
-        <div className="mt-2 space-y-8">
+        <div className="mt-8 space-y-8">
           {jobs.map((job) => (
             <article
               key={job.company}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import AmbientAliens from './AmbientAliens'
 import PixelSprite from './PixelSprite'
 import SpaceInvaders from './SpaceInvaders'
 import { PLANET_PATTERN, planetColors } from './pixelSprites'
@@ -12,19 +13,25 @@ const stars = [
 ]
 
 function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(
+    () => window.matchMedia('(min-width: 1024px)').matches,
+  )
 
   useEffect(() => {
-    setIsDesktop(window.matchMedia('(min-width: 1024px)').matches)
+    const mql = window.matchMedia('(min-width: 1024px)')
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
   }, [])
 
   return isDesktop
 }
 
 function HeroBackground() {
-  // On narrow screens the Hero text wraps to full width, leaving no
-  // clear space for the alien battlefield / planets, so the whole scene
-  // (beyond a plain ambient glow) is desktop/tablet only.
+  // On narrow screens the Hero text wraps to full width, leaving no clear
+  // space for the full battlefield, so the interactive game + star/planet
+  // decor is desktop/tablet only. Mobile/tablet gets a CSS-only ambient
+  // drift instead of the JS game loop — cheap enough to run forever.
   const isDesktop = useIsDesktop()
 
   return (
@@ -34,7 +41,7 @@ function HeroBackground() {
     >
       <div className="absolute top-24 -right-16 h-72 w-72 rounded-full bg-cyan/10 blur-3xl" />
 
-      {isDesktop && (
+      {isDesktop ? (
         <>
           {stars.map((star, i) => (
             <span
@@ -65,6 +72,8 @@ function HeroBackground() {
 
           <SpaceInvaders />
         </>
+      ) : (
+        <AmbientAliens />
       )}
     </div>
   )

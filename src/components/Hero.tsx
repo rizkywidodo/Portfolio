@@ -13,7 +13,7 @@ function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-screen items-center overflow-hidden px-6 pt-24"
+      className="relative flex min-h-screen items-start overflow-hidden px-6 pt-28 lg:pt-40"
     >
       <HeroBackground />
 
@@ -29,9 +29,9 @@ function Hero() {
         <p className="mt-6 max-w-xl leading-relaxed text-slate-400">
           Fresh grad who spent the past year coding things people actually
           use at work, not just class assignments — talking through
-          requirements, writing PRDs, shipping it myself. Split my time
-          between two very different worlds: public transit (MRT Jakarta)
-          and banking (BRI).
+          requirements, writing PRDs, shipping it myself. Curious by
+          default: if something looks interesting, I'll try building it
+          myself before asking if it's possible.
         </p>
 
         <div className="pointer-events-auto mt-8 flex flex-wrap gap-4">

@@ -82,7 +82,7 @@ function Terminal() {
 
   return (
     <section id="terminal" className="border-t-4 border-border">
-      <div className="mx-auto max-w-5xl px-6 pt-16 pb-24">
+      <div className="mx-auto max-w-5xl px-6 pt-10 pb-16 lg:pt-16 lg:pb-24">
         <h2 className="font-pixel text-xl text-cyan">// TERMINAL</h2>
         <p className="mt-4 max-w-xl text-sm text-slate-400">
           Try it — type a command below.{' '}

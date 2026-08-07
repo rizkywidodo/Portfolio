@@ -24,7 +24,7 @@ function Skills() {
 
   return (
     <section id="skills" className="border-t-4 border-border">
-      <div className="mx-auto max-w-5xl px-6 pt-24 pb-16">
+      <div className="mx-auto max-w-5xl px-6 pt-16 pb-10 lg:pt-24 lg:pb-16">
         <h2 className="font-pixel text-xl text-cyan">// SKILLS</h2>
 
         <p className="font-pixel mt-10 text-[10px] tracking-widest text-slate-500">
