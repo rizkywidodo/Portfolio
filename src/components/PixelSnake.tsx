@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 
 const CELL = 20
 const LENGTH = 10
@@ -35,10 +36,12 @@ function Snake({
   cols,
   rows,
   index,
+  active,
 }: {
   cols: number
   rows: number
   index: number
+  active: boolean
 }) {
   const colsRef = useRef(cols)
   const rowsRef = useRef(rows)
@@ -52,6 +55,7 @@ function Snake({
   const [segments, setSegments] = useState<Cell[]>(segmentsRef.current)
 
   useEffect(() => {
+    if (!active) return
     const interval = setInterval(() => {
       const c = colsRef.current
       const r = rowsRef.current
@@ -70,7 +74,7 @@ function Snake({
       setSegments(nextSegments)
     }, TICK_MS)
     return () => clearInterval(interval)
-  }, [])
+  }, [active])
 
   return (
     <>
@@ -104,6 +108,8 @@ function Snake({
 function PixelSnake() {
   const trackRef = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ cols: 0, rows: 0 })
+  const [inView, setInView] = useState(true)
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     const el = trackRef.current
@@ -123,6 +129,21 @@ function PixelSnake() {
     return () => observer.disconnect()
   }, [])
 
+  // Purely decorative and would otherwise crawl forever: stop ticking once
+  // scrolled out of view, and don't auto-move at all under reduced motion.
+  useEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const active = inView && !reducedMotion
+
   return (
     <div
       ref={trackRef}
@@ -132,7 +153,7 @@ function PixelSnake() {
       {size.cols > 0 &&
         size.rows > 0 &&
         Array.from({ length: SNAKE_COUNT }, (_, i) => (
-          <Snake key={i} cols={size.cols} rows={size.rows} index={i} />
+          <Snake key={i} cols={size.cols} rows={size.rows} index={i} active={active} />
         ))}
     </div>
   )

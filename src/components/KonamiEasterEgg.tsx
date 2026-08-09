@@ -26,7 +26,7 @@ function KonamiEasterEgg() {
 
   return (
     <div className="fixed inset-x-0 bottom-6 z-[100] flex justify-center px-4">
-      <div className="font-pixel animate-float border-4 border-cyan bg-panel px-6 py-4 text-center text-[11px] text-cyan shadow-[6px_6px_0_0_#2a3152]">
+      <div className="font-pixel animate-float border-4 border-cyan bg-panel px-6 py-4 text-center text-[11px] text-cyan shadow-[6px_6px_0_0_var(--color-border)]">
         <p>&gt; BOSS DEFEATED — YOU WIN</p>
         <p className="mt-3 text-slate-300">
           Let's talk —{' '}

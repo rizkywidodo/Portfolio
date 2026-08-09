@@ -26,6 +26,64 @@ export function playShoot() {
   osc.stop(audio.currentTime + 0.1)
 }
 
+export function playCoin() {
+  const audio = getContext()
+  const now = audio.currentTime
+  ;[988, 1319].forEach((freq, i) => {
+    const start = now + i * 0.08
+    const osc = audio.createOscillator()
+    const gain = audio.createGain()
+    osc.type = 'square'
+    osc.frequency.setValueAtTime(freq, start)
+    gain.gain.setValueAtTime(0.07, start)
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.15)
+    osc.connect(gain).connect(audio.destination)
+    osc.start(start)
+    osc.stop(start + 0.15)
+  })
+}
+
+export function playInsert() {
+  const audio = getContext()
+  const osc = audio.createOscillator()
+  const gain = audio.createGain()
+  osc.type = 'square'
+  osc.frequency.setValueAtTime(180, audio.currentTime)
+  osc.frequency.exponentialRampToValueAtTime(90, audio.currentTime + 0.09)
+  gain.gain.setValueAtTime(0.12, audio.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.1)
+  osc.connect(gain).connect(audio.destination)
+  osc.start()
+  osc.stop(audio.currentTime + 0.1)
+}
+
+export function playSelect() {
+  const audio = getContext()
+  const osc = audio.createOscillator()
+  const gain = audio.createGain()
+  osc.type = 'square'
+  osc.frequency.setValueAtTime(520, audio.currentTime)
+  gain.gain.setValueAtTime(0.05, audio.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.07)
+  osc.connect(gain).connect(audio.destination)
+  osc.start()
+  osc.stop(audio.currentTime + 0.07)
+}
+
+export function playHop() {
+  const audio = getContext()
+  const osc = audio.createOscillator()
+  const gain = audio.createGain()
+  osc.type = 'square'
+  osc.frequency.setValueAtTime(300, audio.currentTime)
+  osc.frequency.exponentialRampToValueAtTime(700, audio.currentTime + 0.12)
+  gain.gain.setValueAtTime(0.08, audio.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.15)
+  osc.connect(gain).connect(audio.destination)
+  osc.start()
+  osc.stop(audio.currentTime + 0.15)
+}
+
 export function playExplosion() {
   const audio = getContext()
   const duration = 0.25

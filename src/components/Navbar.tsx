@@ -38,7 +38,7 @@ function Navbar() {
           RW_
         </Link>
 
-        <ul className="hidden items-center gap-6 font-pixel text-[10px] tracking-wide text-slate-400 uppercase sm:flex">
+        <ul className="hidden items-center gap-6 font-pixel text-[11px] tracking-wide text-slate-400 uppercase sm:flex">
           {sectionLinks.map((link) => (
             <li key={link.id}>
               <a
@@ -62,7 +62,7 @@ function Navbar() {
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-label="Toggle menu"
           aria-expanded={menuOpen}
-          className="flex flex-col gap-1.5 sm:hidden"
+          className="-m-3.5 flex cursor-pointer flex-col gap-1.5 p-3.5 sm:hidden"
         >
           <span
             className={`block h-0.5 w-6 bg-cyan transition-transform ${menuOpen ? 'translate-y-2 rotate-45' : ''}`}

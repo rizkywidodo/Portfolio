@@ -9,8 +9,8 @@ export const SHIP_PATTERN = [
 ]
 
 export const SHIP_COLORS: Record<string, string> = {
-  C: '#2ee6ff',
-  F: '#ffe14d',
+  C: 'var(--color-cyan)',
+  F: 'var(--color-yellow)',
 }
 
 export const ALIEN_PATTERN = [
@@ -37,7 +37,7 @@ export const BOSS_PATTERN = [
 
 export const BOSS_COLORS: Record<string, string> = {
   B: '#ff2b6d',
-  E: '#ffe14d',
+  E: 'var(--color-yellow)',
 }
 
 export const PLANET_PATTERN = [
@@ -56,3 +56,52 @@ export const planetColors = (base: string, crater: string) => ({
   P: base,
   d: crater,
 })
+
+export const GRAD_PATTERN = [
+  '..GGGGG..',
+  '.GGGGGGG.',
+  '...PPP...',
+  '..PPPPP..',
+  '.PPPPPPP.',
+  '.PP.P.PP.',
+  '..P...P..',
+]
+
+export const GRAD_COLORS: Record<string, string> = {
+  G: 'var(--color-yellow)',
+  P: 'var(--color-cyan)',
+}
+
+// Small on-brand control glyphs, drawn the same way as every other sprite
+// on the site — replaces raw Unicode ▶/❚❚/■ so control icons match the
+// hand-drawn alien/ship/boss art instead of borrowing a system font glyph.
+export const PLAY_PATTERN = [
+  '.......',
+  '.X.....',
+  '.XX....',
+  '.XXX...',
+  '.XXXX..',
+  '.XXX...',
+  '.XX....',
+  '.X.....',
+]
+
+export const PAUSE_PATTERN = [
+  '.......',
+  '.XX.XX.',
+  '.XX.XX.',
+  '.XX.XX.',
+  '.XX.XX.',
+  '.XX.XX.',
+  '.......',
+]
+
+export const STOP_PATTERN = [
+  '.......',
+  '.XXXXX.',
+  '.XXXXX.',
+  '.XXXXX.',
+  '.XXXXX.',
+  '.XXXXX.',
+  '.......',
+]

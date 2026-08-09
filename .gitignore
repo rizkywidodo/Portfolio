@@ -13,6 +13,8 @@ dist-ssr
 *.local
 
 .claude/settings.local.json
+.impeccable/
+.github/hooks/
 
 # Editor directories and files
 .vscode/*

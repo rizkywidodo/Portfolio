@@ -1,5 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { playInsert, playSelect, unlockAudio } from '../lib/sound'
+
+const LOAD_MS = 500
+type CartridgeState = 'closed' | 'loading' | 'open'
 
 type Project = {
   title: string
@@ -66,6 +70,16 @@ const companies = [...new Set(projects.map((project) => companyOf(project.org)))
 
 function ProjectsPage() {
   const location = useLocation()
+  const [cartridges, setCartridges] = useState<Record<string, CartridgeState>>({})
+
+  const insertCartridge = (title: string) => {
+    unlockAudio()
+    playInsert()
+    setCartridges((prev) => ({ ...prev, [title]: 'loading' }))
+    window.setTimeout(() => {
+      setCartridges((prev) => ({ ...prev, [title]: 'open' }))
+    }, LOAD_MS)
+  }
 
   // Nav/links to a specific company's projects pass the target section id
   // via router state (see WorkExperience.tsx) since HashRouter can't also
@@ -84,7 +98,11 @@ function ProjectsPage() {
     <section className="mx-auto max-w-5xl px-6 pt-32 pb-24">
       <Link
         to="/"
-        className="font-pixel inline-block text-[10px] text-slate-500 transition-colors hover:text-pink"
+        onClick={() => {
+          unlockAudio()
+          playSelect()
+        }}
+        className="font-pixel inline-block text-[11px] text-muted transition-colors hover:text-pink"
       >
         &larr; BACK
       </Link>
@@ -98,60 +116,100 @@ function ProjectsPage() {
 
       {companies.map((company) => (
         <div key={company} id={slugify(company)} className="mt-16 first:mt-10">
-          <h2 className="font-pixel text-[11px] tracking-widest text-slate-500">
+          <h2 className="font-pixel text-[11px] tracking-widest text-muted">
             {company.toUpperCase()}
           </h2>
 
           <div className="mt-6 space-y-8">
             {projects
               .filter((project) => companyOf(project.org) === company)
-              .map((project) => (
-                <article
-                  key={project.title}
-                  className="border-4 border-border bg-panel p-8 shadow-[8px_8px_0_0_#2a3152] transition-transform hover:-translate-y-1"
-                >
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="font-pixel text-sm text-slate-100 md:text-base">
-                      {project.title}
-                    </h3>
-                    <span className="font-pixel text-[10px] text-slate-500">
-                      {project.org}
-                    </span>
-                  </div>
+              .map((project) => {
+                const status = cartridges[project.title] ?? 'closed'
+                return (
+                  <article
+                    key={project.title}
+                    className="overflow-hidden border-4 border-border bg-panel shadow-[8px_8px_0_0_var(--color-border)] transition-transform hover:-translate-y-1"
+                  >
+                    <div className="flex items-center gap-2 bg-border px-6 py-3">
+                      <span className="text-cyan">▣</span>
+                      <span className="font-pixel text-[11px] tracking-wide text-cyan">
+                        CARTRIDGE {String(projects.indexOf(project) + 1).padStart(2, '0')} —{' '}
+                        {project.title.toUpperCase()}
+                      </span>
+                    </div>
 
-                  <dl className="mt-8 grid gap-6 sm:grid-cols-3">
-                    {(
-                      [
-                        ['PROBLEM', project.problem],
-                        ['SOLUTION', project.solution],
-                        ['IMPACT', project.impact],
-                      ] as const
-                    ).map(([label, text]) => (
-                      <div key={label}>
-                        <dt
-                          className={`font-pixel text-[10px] tracking-wide ${labelColor[label]}`}
-                        >
-                          {label}
-                        </dt>
-                        <dd className="mt-3 text-sm leading-relaxed text-slate-400">
-                          {text}
-                        </dd>
+                    <div className="p-8">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 className="font-pixel text-sm text-slate-100 md:text-base">
+                          {project.title}
+                        </h3>
+                        <span className="font-pixel text-[11px] text-muted">
+                          {project.org}
+                        </span>
                       </div>
-                    ))}
-                  </dl>
 
-                  <ul className="mt-8 flex flex-wrap gap-2">
-                    {project.stack.map((tech) => (
-                      <li
-                        key={tech}
-                        className="border-2 border-border px-3 py-1 text-[10px] text-slate-400"
-                      >
-                        {tech}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
+                      {status === 'open' && (
+                        <>
+                          <dl className="mt-8 grid gap-6 sm:grid-cols-3">
+                            {(
+                              [
+                                ['PROBLEM', project.problem],
+                                ['SOLUTION', project.solution],
+                                ['IMPACT', project.impact],
+                              ] as const
+                            ).map(([label, text]) => (
+                              <div key={label}>
+                                <dt
+                                  className={`font-pixel text-[11px] tracking-wide ${labelColor[label]}`}
+                                >
+                                  {label}
+                                </dt>
+                                <dd className="mt-3 text-sm leading-relaxed text-slate-400">
+                                  {text}
+                                </dd>
+                              </div>
+                            ))}
+                          </dl>
+
+                          <ul className="mt-8 flex flex-wrap gap-2">
+                            {project.stack.map((tech) => (
+                              <li
+                                key={tech}
+                                className="border-2 border-border px-3 py-1 text-[11px] text-slate-400"
+                              >
+                                {tech}
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+
+                      {status === 'loading' && (
+                        <div className="mt-8">
+                          <div className="h-4 w-full border-2 border-border bg-bg">
+                            <div className="animate-cartridge-load h-full bg-cyan" />
+                          </div>
+                          <p className="font-pixel mt-3 text-[11px] tracking-wide text-muted">
+                            LOADING…
+                          </p>
+                        </div>
+                      )}
+
+                      {status === 'closed' && (
+                        <div className="mt-8 flex justify-center py-6">
+                          <button
+                            type="button"
+                            onClick={() => insertCartridge(project.title)}
+                            className="animate-blink font-pixel cursor-pointer text-[11px] tracking-wide text-pink transition-colors hover:text-cyan focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink"
+                          >
+                            ▸ INSERT TO VIEW DETAILS
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                )
+              })}
           </div>
         </div>
       ))}

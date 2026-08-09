@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import KonamiEasterEgg from './components/KonamiEasterEgg'
+import CRTOverlay from './components/CRTOverlay'
 import Home from './pages/Home'
 import ProjectsPage from './pages/ProjectsPage'
 
@@ -20,6 +21,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <CRTOverlay />
       <KonamiEasterEgg />
       <Navbar />
       <main>

@@ -6,8 +6,9 @@ import {
   BOSS_PATTERN,
   SHIP_COLORS,
   SHIP_PATTERN,
+  STOP_PATTERN,
 } from './pixelSprites'
-import { playExplosion, playShoot, unlockAudio } from '../lib/sound'
+import { playCoin, playExplosion, playShoot, unlockAudio } from '../lib/sound'
 import { BOSS_DEFEATED_EVENT, KONAMI_EVENT } from './KonamiEasterEgg'
 
 type Alien = {
@@ -20,8 +21,13 @@ type Alien = {
 type Bullet = { id: string; x: number; y: number }
 type Explosion = { id: string; x: number; y: number; color: string }
 
-const ALIEN_COLORS = ['#ff4fd8', '#ffe14d', '#7dffb3', '#2ee6ff']
-const ALIEN_COUNT = 16
+const ALIEN_COLORS = [
+  'var(--color-pink)',
+  'var(--color-yellow)',
+  'var(--color-green)',
+  'var(--color-cyan)',
+]
+const ALIEN_COUNT = 9
 const DESCEND_PER_TICK = 0.28 // percent of battlefield height
 const DESCEND_EVERY_N_FRAMES = 3
 const RESPAWN_DELAY_MS = 220
@@ -42,12 +48,20 @@ const CONFETTI_COUNT = 16
 const randomColor = () =>
   ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)]
 const randomX = () => 5 + Math.random() * 90
+// Every respawn (initial spawn, wrap-around, post-hit) picks its own random
+// y jitter so aliens drift out of sync over time — without this they'd all
+// re-cross the top edge in lockstep every lap (same descend rate for all,
+// same fixed restart y), producing a fresh dense "swarm" every ~17s forever.
+const spawnY = (spread: number) => -8 - Math.random() * spread
 
+// Aliens only exist once the visitor inserts a coin, so every spawn is a
+// fresh wave — start them staggered well above the top edge so they trickle
+// in over several seconds rather than arriving as one dense clump.
 function makePool(): Alien[] {
   return Array.from({ length: ALIEN_COUNT }, (_, i) => ({
     id: `a${i}`,
     x: randomX(),
-    y: Math.random() * 60 - 10, // staggered so it's already full on first paint
+    y: spawnY(70),
     color: randomColor(),
     hidden: false,
   }))
@@ -56,8 +70,13 @@ function makePool(): Alien[] {
 const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n))
 
-function SpaceInvaders() {
+function SpaceInvaders({
+  safeZone,
+}: {
+  safeZone: { top: number; bottom: number } | null
+}) {
   const battlefieldRef = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(true)
   const [shipX, setShipX] = useState(50)
   const [aliens, setAliens] = useState<Alien[]>(() => makePool())
   const [bullets, setBullets] = useState<Bullet[]>([])
@@ -95,6 +114,20 @@ function SpaceInvaders() {
     }
   }, [])
 
+  // Pause the whole battlefield (rAF loop below) once it's scrolled out of
+  // view — there's no reason to keep computing alien positions/collisions
+  // for a game nobody can see.
+  useEffect(() => {
+    const el = battlefieldRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   useEffect(() => {
     const stored = Number(localStorage.getItem(HIGH_SCORE_KEY))
     if (Number.isFinite(stored)) setHighScore(stored)
@@ -119,8 +152,13 @@ function SpaceInvaders() {
 
   // Single rAF loop: descends aliens, moves bullets up, and checks
   // collisions each frame. Reads current state via refs (not the
-  // closed-over `aliens`/`bullets`) so the effect never needs to restart.
+  // closed-over `aliens`/`bullets`) so the effect never needs to restart
+  // (aside from the inView gate below, which stops it entirely off-screen).
   useEffect(() => {
+    // Aliens (and everything else here) only exist during an active
+    // session — insert-coin gates the whole loop, not just rendering.
+    if (!inView || !playing) return
+
     let raf: number
 
     const tick = () => {
@@ -128,12 +166,14 @@ function SpaceInvaders() {
       const currentBullets = bulletsRef.current
       let currentAliens = aliensRef.current
 
-      if (frameRef.current % DESCEND_EVERY_N_FRAMES === 0) {
+      const shouldDescend = frameRef.current % DESCEND_EVERY_N_FRAMES === 0
+
+      if (shouldDescend) {
         currentAliens = currentAliens.map((a) => {
           if (a.hidden) return a
           const y = a.y + DESCEND_PER_TICK
           return y > 90
-            ? { ...a, x: randomX(), y: -8, color: randomColor() }
+            ? { ...a, x: randomX(), y: spawnY(12), color: randomColor() }
             : { ...a, y }
         })
         aliensRef.current = currentAliens
@@ -149,6 +189,7 @@ function SpaceInvaders() {
 
       if (currentBullets.length > 0) {
         const hits: Alien[] = []
+        const hitIds = new Set<string>()
         const nextBullets: Bullet[] = []
         let bossHitCount = 0
 
@@ -171,17 +212,19 @@ function SpaceInvaders() {
           const hit = currentAliens.find(
             (a) =>
               !a.hidden &&
-              !hits.includes(a) &&
+              !hitIds.has(a.id) &&
               Math.abs(a.x - bullet.x) < HIT_RADIUS &&
               Math.abs(a.y - y) < HIT_RADIUS,
           )
           if (hit) {
             hits.push(hit)
+            hitIds.add(hit.id)
             continue
           }
           nextBullets.push({ ...bullet, y })
         }
 
+        bulletsRef.current = nextBullets
         setBullets(nextBullets)
 
         if (bossFight && bossHitCount > 0) {
@@ -223,10 +266,13 @@ function SpaceInvaders() {
             window.dispatchEvent(new Event(BOSS_DEFEATED_EVENT))
           }
         } else if (hits.length > 0) {
-          const hitIds = new Set(hits.map((a) => a.id))
-          setAliens((prev) =>
-            prev.map((a) => (hitIds.has(a.id) ? { ...a, hidden: true } : a)),
-          )
+          setAliens((prev) => {
+            const next = prev.map((a) =>
+              hitIds.has(a.id) ? { ...a, hidden: true } : a,
+            )
+            aliensRef.current = next
+            return next
+          })
           setExplosions((prev) => [
             ...prev,
             ...hits.map((a) => ({
@@ -249,13 +295,15 @@ function SpaceInvaders() {
           })
 
           const t = setTimeout(() => {
-            setAliens((prev) =>
-              prev.map((a) =>
+            setAliens((prev) => {
+              const next = prev.map((a) =>
                 hitIds.has(a.id)
-                  ? { ...a, x: randomX(), y: -8, color: randomColor(), hidden: false }
+                  ? { ...a, x: randomX(), y: spawnY(12), color: randomColor(), hidden: false }
                   : a,
-              ),
-            )
+              )
+              aliensRef.current = next
+              return next
+            })
           }, RESPAWN_DELAY_MS)
           respawnTimeouts.current.push(t)
         }
@@ -266,16 +314,18 @@ function SpaceInvaders() {
 
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [])
+  }, [inView, playing])
 
   // Auto-fire from the ship's current x, no click required — only while playing.
   useEffect(() => {
     if (!playing) return
     const interval = setInterval(() => {
-      setBullets((prev) => [
-        ...prev,
+      const nextBullets = [
+        ...bulletsRef.current,
         { id: `b${Date.now()}-${Math.random()}`, x: shipXRef.current, y: 90 },
-      ])
+      ]
+      bulletsRef.current = nextBullets
+      setBullets(nextBullets)
       playShoot()
     }, FIRE_INTERVAL_MS)
     return () => clearInterval(interval)
@@ -293,8 +343,18 @@ function SpaceInvaders() {
   const togglePlaying = () => {
     setPlaying((prev) => {
       const next = !prev
-      if (next) unlockAudio()
-      else setBullets([])
+      if (next) {
+        unlockAudio()
+        playCoin()
+        const pool = makePool()
+        aliensRef.current = pool
+        setAliens(pool)
+      } else {
+        bulletsRef.current = []
+        setBullets([])
+        for (const t of respawnTimeouts.current) clearTimeout(t)
+        respawnTimeouts.current = []
+      }
       return next
     })
   }
@@ -303,47 +363,83 @@ function SpaceInvaders() {
     <div
       ref={battlefieldRef}
       onPointerMove={handlePointerMove}
-      className="pointer-events-auto absolute inset-0 touch-pan-y select-none"
+      className="pointer-events-auto absolute inset-0 touch-pan-y select-none [container-type:size]"
     >
-      <div className="pointer-events-none absolute inset-x-4 top-24 grid grid-cols-3 items-center">
-        <p className="font-pixel justify-self-start border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-yellow">
-          {playing ? '▸ MOVE TO STEER' : '▸ PRESS PLAY TO DEFEND'}
-        </p>
-        <p className="font-pixel justify-self-center border-2 border-border bg-panel/90 px-2 py-1 text-[10px] text-green">
-          SCORE {score} · HI {highScore}
-        </p>
-        <button
-          type="button"
-          onClick={togglePlaying}
-          className={`pointer-events-auto font-pixel justify-self-end border-2 px-2 py-1 text-[10px] transition-colors ${
-            playing
-              ? 'border-pink bg-panel/90 text-pink hover:border-cyan hover:text-cyan'
-              : 'border-cyan bg-panel/90 text-cyan hover:border-pink hover:text-pink'
-          }`}
+      {playing ? (
+        <div className="pointer-events-none absolute inset-x-4 top-24 grid grid-cols-3 items-center">
+          <p className="font-pixel justify-self-start border-2 border-border bg-panel/90 px-2 py-1 text-[11px] text-yellow">
+            MOVE TO STEER
+          </p>
+          <p
+            role="status"
+            aria-live="polite"
+            className="font-pixel justify-self-center border-2 border-border bg-panel/90 px-2 py-1 text-[11px] text-green"
+          >
+            SCORE {score} · HI {highScore}
+          </p>
+          <button
+            type="button"
+            onClick={togglePlaying}
+            aria-label="Stop Space Invaders game"
+            className="pointer-events-auto cursor-pointer font-pixel justify-self-end flex items-center gap-1.5 border-2 border-pink bg-panel/90 px-2 py-1 text-[11px] text-pink transition-colors hover:border-cyan hover:text-cyan focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink"
+          >
+            <PixelSprite rows={STOP_PATTERN} colorMap={{ X: 'currentColor' }} pixelSize={2} />
+            STOP
+          </button>
+        </div>
+      ) : (
+        <div
+          className="pointer-events-none absolute inset-x-0 flex justify-center"
+          // Anchored to the actual bottom of the text column (a fixed gap
+          // below it), not a fixed distance from the viewport edge — once
+          // the hero text is truly centered, the two can end up far apart
+          // depending on content height/viewport, leaving a dead gap.
+          style={safeZone ? { top: safeZone.bottom + 56 } : { bottom: '1.75rem' }}
         >
-          {playing ? '■ STOP' : '▶ PLAY'}
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={togglePlaying}
+            aria-label="Insert coin to play Space Invaders"
+            className="animate-blink pointer-events-auto cursor-pointer font-pixel text-[11px] tracking-wide text-pink transition-colors hover:text-cyan focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink"
+          >
+            ▸ INSERT COIN TO CONTINUE
+          </button>
+        </div>
+      )}
 
-      {!bossActive &&
+      {playing &&
+        !bossActive &&
         aliens.map(
           (a) =>
             !a.hidden && (
-              <PixelSprite
+              // Position lives on this wrapper via `transform` (compositor-only,
+              // no layout reflow) so 16 aliens moving every tick doesn't force
+              // a reflow burst. The bob animation stays on the inner sprite —
+              // it also drives `transform`, so it needs its own element rather
+              // than sharing this one's transform.
+              <div
                 key={a.id}
-                rows={ALIEN_PATTERN}
-                colorMap={{ A: a.color }}
-                pixelSize={4}
-                className="animate-float absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: `${a.x}%`, top: `${a.y}%` }}
-              />
+                className="absolute"
+                style={{
+                  transform: `translate(-50%, -50%) translate(${a.x}cqw, ${a.y}cqh)`,
+                }}
+              >
+                <PixelSprite
+                  rows={ALIEN_PATTERN}
+                  colorMap={{ A: a.color }}
+                  pixelSize={4}
+                  className="animate-float"
+                />
+              </div>
             ),
         )}
 
       {bossActive && (
         <div
-          className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2"
-          style={{ left: `${bossX}%`, top: `${BOSS_Y}%` }}
+          className="absolute flex flex-col items-center gap-2"
+          style={{
+            transform: `translate(-50%, -50%) translate(${bossX}cqw, ${BOSS_Y}cqh)`,
+          }}
         >
           <p className="font-pixel text-[9px] text-pink">BOSS</p>
           <div className="h-2 w-32 border-2 border-border bg-panel">
@@ -390,8 +486,8 @@ function SpaceInvaders() {
       {bullets.map((b) => (
         <div
           key={b.id}
-          className="absolute h-3 w-0.75 -translate-x-1/2 bg-yellow"
-          style={{ left: `${b.x}%`, top: `${b.y}%` }}
+          className="absolute h-3 w-0.75 bg-yellow"
+          style={{ transform: `translate(-50%, 0) translate(${b.x}cqw, ${b.y}cqh)` }}
         />
       ))}
 
@@ -400,8 +496,11 @@ function SpaceInvaders() {
           rows={SHIP_PATTERN}
           colorMap={SHIP_COLORS}
           pixelSize={5}
-          className="absolute -translate-x-1/2"
-          style={{ left: `${shipX}%`, top: 'calc(100% - 100px)' }}
+          className="absolute"
+          style={{
+            top: 'calc(100% - 100px)',
+            transform: `translate(-50%, 0) translate(${shipX}cqw, 0)`,
+          }}
         />
       )}
     </div>

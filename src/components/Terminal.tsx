@@ -86,7 +86,7 @@ function Terminal() {
         <h2 className="font-pixel text-xl text-cyan">// TERMINAL</h2>
         <p className="mt-4 max-w-xl text-sm text-slate-400">
           Try it — type a command below.{' '}
-          <span className="text-slate-500">
+          <span className="text-muted">
             (psst — try 'whoami' or 'help')
           </span>
         </p>
@@ -95,13 +95,18 @@ function Terminal() {
           className="mt-10 border-4 border-border bg-panel p-6 text-sm"
           onClick={() => inputRef.current?.focus()}
         >
-          <div ref={scrollRef} className="max-h-80 space-y-3 overflow-y-auto">
+          <div
+            ref={scrollRef}
+            role="log"
+            aria-live="polite"
+            className="max-h-80 space-y-3 overflow-y-auto"
+          >
             {history.map((line, i) => (
               <div key={i}>
                 {line.command !== undefined && (
                   <p className="text-cyan">
                     <span className="text-green">guest@rizky</span>
-                    <span className="text-slate-500">:~$</span> {line.command}
+                    <span className="text-muted">:~$</span> {line.command}
                   </p>
                 )}
                 {line.output.map((text, j) => (
@@ -118,14 +123,15 @@ function Terminal() {
             className="mt-3 flex items-center gap-2"
           >
             <span className="text-green">guest@rizky</span>
-            <span className="text-slate-500">:~$</span>
+            <span className="text-muted">:~$</span>
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               autoComplete="off"
               spellCheck={false}
-              className="flex-1 bg-transparent text-cyan caret-cyan outline-none"
+              aria-label="Terminal command input"
+              className="flex-1 bg-transparent text-cyan caret-cyan outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan"
             />
           </form>
         </div>

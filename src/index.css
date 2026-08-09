@@ -11,9 +11,13 @@
   --color-pink: #ff4fd8;
   --color-yellow: #ffe14d;
   --color-green: #7dffb3;
+  /* Muted secondary text — tuned to ~5.6:1 against --color-bg (slate-500/600
+     both fail WCAG AA at 4.0:1 / 2.5:1 respectively). */
+  --color-muted: #7c8ca2;
 
   --animate-float: pixel-float 6s steps(12) infinite;
   --animate-blink: pixel-blink 1.2s steps(2) infinite;
+  --animate-cartridge-load: cartridge-load 0.5s steps(10) forwards;
 }
 
 @keyframes pixel-float {
@@ -29,6 +33,15 @@
 @keyframes pixel-blink {
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes cartridge-load {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
   }
 }
 
@@ -80,4 +93,100 @@ body {
 ::selection {
   background: var(--color-pink);
   color: var(--color-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Keep blinking/floating elements visible (they carry real state, e.g.
+     "online") but stop the continuous, automatically-started motion. */
+  .animate-blink,
+  .animate-float {
+    animation: none;
+  }
+}
+
+/* ---------- CRT frame: scanlines, vignette, boot power-on ---------- */
+
+.crt-scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0.12) 1px,
+    rgba(0, 0, 0, 0) 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+.crt-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 60%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  /* The radial-gradient alone was too faint to read as a real CRT frame —
+     this inset shadow (present in the approved prototype, dropped when
+     first built into the real site) is what actually darkens the edges
+     enough to feel like a screen, not just a color shift. */
+  box-shadow: inset 0 0 120px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Very rare, very subtle — a long reading session (case studies, terminal)
+   shouldn't be interrupted by a repeating effect, just occasionally
+   reminded it's a screen. */
+.crt-ambient-flicker {
+  background: rgba(255, 255, 255, 0.015);
+  animation: crt-ambient 14s infinite;
+}
+@keyframes crt-ambient {
+  0%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+  97% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 0;
+  }
+}
+
+/* Held static past halfway, then a two-pulse flicker, then a CRT-style
+   scaleY snap-off as it reveals the real page. One-time only (not a
+   repeating loop), so this is judged against the single-flash case, not
+   the sustained-strobe case the 3-flashes/sec rule targets. Reduced-motion
+   visitors never render this (see CRTOverlay.tsx), so no static fallback
+   is needed here. */
+.crt-boot-screen {
+  animation: crt-power-on 1300ms ease-out both;
+}
+@keyframes crt-power-on {
+  0%,
+  55% {
+    opacity: 1;
+    filter: brightness(1);
+    transform: scaleY(1);
+  }
+  62% {
+    filter: brightness(3.2);
+  }
+  68% {
+    filter: brightness(0.5);
+  }
+  74% {
+    filter: brightness(2.4);
+  }
+  82% {
+    filter: brightness(0.7);
+  }
+  92% {
+    opacity: 1;
+    filter: brightness(1);
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(1);
+    transform: scaleY(0.02);
+    visibility: hidden;
+  }
 }

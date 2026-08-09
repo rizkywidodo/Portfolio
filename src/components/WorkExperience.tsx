@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import PixelSnake from './PixelSnake'
+import { playSelect, unlockAudio } from '../lib/sound'
 
 const jobs = [
   {
@@ -30,33 +31,48 @@ function WorkExperience() {
         <h2 className="font-pixel text-xl text-cyan">// WORK EXPERIENCE</h2>
 
         <div className="mt-8 space-y-8">
-          {jobs.map((job) => (
+          {jobs.map((job, index) => (
             <article
               key={job.company}
-              className="border-4 border-border bg-panel p-8 shadow-[8px_8px_0_0_#2a3152]"
+              className="overflow-hidden border-4 border-border bg-panel shadow-[8px_8px_0_0_var(--color-border)]"
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="font-pixel text-sm text-slate-100 md:text-base">
-                  {job.company}
-                </h3>
-                <span className="font-pixel text-[10px] text-slate-500">
-                  {job.role} · {job.dates}
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-border px-6 py-3">
+                <span className="font-pixel text-[11px] tracking-wide text-yellow">
+                  ▣ MISSION FILE {String(index + 1).padStart(2, '0')} — {job.company.toUpperCase()}
+                </span>
+                <span className="font-pixel -rotate-[4deg] border-2 border-green px-2 py-1 text-[11px] text-green">
+                  STATUS: CLEARED
                 </span>
               </div>
 
-              <p className="mt-6 text-sm leading-relaxed text-slate-400">
-                {job.body}
-              </p>
+              <div className="p-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="font-pixel text-sm text-slate-100 md:text-base">
+                    {job.company}
+                  </h3>
+                  <span className="font-pixel text-[11px] text-muted">
+                    {job.role} · {job.dates}
+                  </span>
+                </div>
 
-              {job.projectsAnchor && (
-                <Link
-                  to="/projects"
-                  state={{ scrollTo: job.projectsAnchor }}
-                  className="font-pixel mt-6 inline-block border-4 border-cyan bg-cyan px-5 py-3 text-[11px] text-bg shadow-[4px_4px_0_0_#131829] transition-transform hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#131829]"
-                >
-                  VIEW PROJECTS →
-                </Link>
-              )}
+                <p className="mt-6 max-w-2xl text-sm leading-relaxed text-slate-400">
+                  {job.body}
+                </p>
+
+                {job.projectsAnchor && (
+                  <Link
+                    to="/projects"
+                    state={{ scrollTo: job.projectsAnchor }}
+                    onClick={() => {
+                      unlockAudio()
+                      playSelect()
+                    }}
+                    className="font-pixel mt-6 inline-block border-4 border-cyan bg-cyan px-5 py-3 text-[11px] text-bg shadow-[4px_4px_0_0_var(--color-panel)] transition-transform hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--color-panel)]"
+                  >
+                    VIEW PROJECTS →
+                  </Link>
+                )}
+              </div>
             </article>
           ))}
         </div>

@@ -27,7 +27,11 @@ function useIsDesktop() {
   return isDesktop
 }
 
-function HeroBackground() {
+function HeroBackground({
+  safeZone,
+}: {
+  safeZone: { top: number; bottom: number } | null
+}) {
   // On narrow screens the Hero text wraps to full width, leaving no clear
   // space for the full battlefield, so the interactive game + star/planet
   // decor is desktop/tablet only. Mobile/tablet gets a CSS-only ambient
@@ -35,46 +39,52 @@ function HeroBackground() {
   const isDesktop = useIsDesktop()
 
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden"
-    >
-      <div className="absolute top-24 -right-16 h-72 w-72 rounded-full bg-cyan/10 blur-3xl" />
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Purely decorative: glow, stars, planets, mobile ambient aliens.
+          Grouped and hidden from the accessibility tree as one unit —
+          `display: contents` keeps it invisible to layout so its children
+          still position against this positioned root, same as before. */}
+      <div aria-hidden="true" className="contents">
+        <div className="absolute top-24 -right-16 h-72 w-72 rounded-full bg-cyan/10 blur-3xl" />
 
-      {isDesktop ? (
-        <>
-          {stars.map((star, i) => (
-            <span
-              key={i}
-              className="animate-blink absolute h-0.75 w-0.75 bg-slate-300"
-              style={{
-                left: `${star.x}%`,
-                top: `${star.y}%`,
-                animationDelay: `${(i % 6) * 0.3}s`,
-              }}
+        {isDesktop ? (
+          <>
+            {stars.map((star, i) => (
+              <span
+                key={i}
+                className="animate-blink absolute h-0.75 w-0.75 bg-slate-300"
+                style={{
+                  left: `${star.x}%`,
+                  top: `${star.y}%`,
+                  animationDelay: `${(i % 6) * 0.3}s`,
+                }}
+              />
+            ))}
+
+            <PixelSprite
+              rows={PLANET_PATTERN}
+              colorMap={planetColors('#4a7dff', '#26418f')}
+              pixelSize={4}
+              className="animate-float absolute opacity-70"
+              style={{ left: '4%', top: '6%' }}
             />
-          ))}
+            <PixelSprite
+              rows={PLANET_PATTERN}
+              colorMap={planetColors('var(--color-pink)', '#a01e8a')}
+              pixelSize={3}
+              className="animate-float absolute opacity-60 [animation-delay:-3s]"
+              style={{ left: '2%', top: '85%' }}
+            />
+          </>
+        ) : (
+          <AmbientAliens />
+        )}
+      </div>
 
-          <PixelSprite
-            rows={PLANET_PATTERN}
-            colorMap={planetColors('#4a7dff', '#26418f')}
-            pixelSize={4}
-            className="animate-float absolute opacity-70"
-            style={{ left: '4%', top: '6%' }}
-          />
-          <PixelSprite
-            rows={PLANET_PATTERN}
-            colorMap={planetColors('#ff4fd8', '#a01e8a')}
-            pixelSize={3}
-            className="animate-float absolute opacity-60 [animation-delay:-3s]"
-            style={{ left: '2%', top: '85%' }}
-          />
-
-          <SpaceInvaders />
-        </>
-      ) : (
-        <AmbientAliens />
-      )}
+      {/* A real, playable game — must stay out of the aria-hidden group
+          above so its PLAY/STOP button and score readout are announced,
+          not a focusable dead end. */}
+      {isDesktop && <SpaceInvaders safeZone={safeZone} />}
     </div>
   )
 }

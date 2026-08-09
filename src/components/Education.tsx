@@ -1,34 +1,23 @@
-const stats = [
-  { label: 'GPA', value: '3.32', color: 'text-cyan' },
-  { label: 'TOEFL ITP', value: '540', color: 'text-pink' },
-  { label: 'Grad Year', value: '2025', color: 'text-yellow' },
-]
+import PixelGraduate from './PixelGraduate'
 
 function Education() {
   return (
-    <section id="education" className="-mt-10 border-t-4 border-border lg:-mt-16">
+    <section id="education" className="border-t-4 border-border">
       <div className="mx-auto max-w-5xl px-6 pt-12 pb-16 lg:pt-16 lg:pb-24">
         <h2 className="font-pixel text-xl text-cyan">// EDUCATION</h2>
 
-        <div className="mt-10 border-4 border-border bg-panel p-8 shadow-[8px_8px_0_0_#2a3152]">
-          <p className="font-pixel text-sm text-slate-200 md:text-base">
-            Institut Teknologi Sepuluh Nopember (ITS)
-          </p>
-          <p className="mt-2 text-sm text-slate-400">
-            Bachelor of Informatics Engineering
-          </p>
-
-          <div className="mt-8 grid grid-cols-3 gap-4 border-t-4 border-border pt-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className={`font-pixel text-lg md:text-2xl ${stat.color}`}>
-                  {stat.value}
-                </p>
-                <p className="mt-2 text-[11px] tracking-wide text-slate-500 uppercase">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
+        <div className="relative mt-10">
+          <PixelGraduate />
+          <div className="border-4 border-border bg-panel p-8 shadow-[8px_8px_0_0_var(--color-border)]">
+            <p className="font-pixel text-sm text-slate-200 md:text-base">
+              Institut Teknologi Sepuluh Nopember (ITS)
+            </p>
+            <p className="mt-2 text-sm text-slate-400">
+              Bachelor of Informatics Engineering
+            </p>
+            <p className="font-pixel mt-4 text-[11px] tracking-wide text-muted">
+              GPA 3.32 · TOEFL ITP 540 · Class of 2025
+            </p>
           </div>
         </div>
       </div>
