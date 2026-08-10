@@ -19,9 +19,9 @@ const projects: Project[] = [
     title: 'Booking Ruang Stasiun',
     org: 'MRT Jakarta — Station Digitalization Intern',
     problem:
-      '13 stations, one Google Form, and no real-time visibility into what was already booked. Double-bookings and manual back-and-forth were routine, with no clean way to track requests at scale.',
+      "13 stations, one Google Form, and no way to see what was already booked in real time. Bookings clashed constantly, and matching requests to available rooms meant a lot of manual coordination with no clean way to track things at scale.",
     solution:
-      'A full-CRUD booking platform with role-based access for super admins, planners, and area authorities. Booking requests trigger instant email confirmations via Brevo SMTP, so approvals happen without anyone manually following up.',
+      'A full CRUD booking platform with separate access levels for super admins, planners, and area authorities. Booking requests trigger instant email confirmations via Brevo SMTP, so approvals happen without anyone manually following up.',
     impact: 'Live across all 13 stations, fully replacing manual coordination.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Vercel', 'Brevo SMTP'],
   },
@@ -29,9 +29,9 @@ const projects: Project[] = [
     title: 'Bank Data Station Dashboard',
     org: 'MRT Jakarta',
     problem:
-      'I was asked to build a dashboard for daily Safety/Service/Security reports that were stuck in laggy, hard-to-filter Excel Online sheets across 4 stations.',
+      'I was asked to build a dashboard for daily Safety/Service/Security reports that were stuck in laggy Excel Online sheets, painful to filter across 4 stations.',
     solution:
-      'I proposed a real web app: a pipeline that turns the raw form export into a live, filterable dashboard with real-time stats, category breakdowns, per-station trends, and drill-down into individual reports with photo attachments.',
+      'I proposed a real web app: a pipeline that turns the raw form export into a live, filterable dashboard, with stats that update in real time, category breakdowns, trends by station, and the ability to dig into individual reports with photo attachments.',
     impact:
       'Now used daily to analyze complaints and findings across stations, with reports updating the moment they\'re uploaded.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Cloudflare'],
