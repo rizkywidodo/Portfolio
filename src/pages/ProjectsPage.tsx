@@ -19,9 +19,9 @@ const projects: Project[] = [
     title: 'Booking Ruang Stasiun',
     org: 'MRT Jakarta — Station Digitalization Intern',
     problem:
-      '13 stations, one Google Form. No real-time visibility into what was already booked, so double-bookings and manual back-and-forth were routine — nobody had a clean way to track requests at scale.',
+      '13 stations, one Google Form. No real-time visibility into what was already booked, so double-bookings and manual back-and-forth were routine, and there was no clean way to track requests at scale.',
     solution:
-      'A full-CRUD booking platform with role-based access (super admin, planner, area authority) and automatic email confirmations via Brevo SMTP — booking requests trigger instant email notifications, so nobody has to manually follow up or ask "did this get approved?" anymore.',
+      'A full-CRUD booking platform with role-based access (super admin, planner, area authority) and automatic email confirmations via Brevo SMTP. Booking requests trigger instant email notifications, so nobody has to manually follow up to check whether a request was approved.',
     impact: 'Live across all 13 stations, fully replacing manual coordination.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Vercel', 'Brevo SMTP'],
   },
@@ -29,22 +29,22 @@ const projects: Project[] = [
     title: 'Bank Data Station Dashboard',
     org: 'MRT Jakarta',
     problem:
-      'I was tasked with building a dashboard for daily Safety/Service/Security reports — but stuck with Excel Online/Sheets as the tool, it was laggy, rigid, and painful to filter across 4 stations.',
+      'I was tasked with building a dashboard for daily Safety/Service/Security reports, but stuck with Excel Online/Sheets as the tool, it was laggy, rigid, and painful to filter across 4 stations.',
     solution:
-      'I proposed building a real web app instead — a pipeline that turns the raw form export into a live, filterable dashboard: real-time stats, category breakdowns, per-station trends, and drill-down into individual reports with photo attachments.',
+      'I proposed building a real web app instead: a pipeline that turns the raw form export into a live, filterable dashboard with real-time stats, category breakdowns, per-station trends, and drill-down into individual reports with photo attachments.',
     impact:
-      'Now used daily to analyze complaints and findings across stations — reports that used to take a wait now update the moment you upload.',
+      'Now used daily to analyze complaints and findings across stations. Reports update the moment they\'re uploaded, instead of after a wait.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Cloudflare'],
   },
   {
     title: 'Station Digitalization Proposal',
     org: 'MRT Jakarta',
     problem:
-      'Regional planners needed to pitch IT investment, but slides alone are easy to say no to — people need to see it, not just hear about it.',
+      'Regional planners needed to pitch IT investment, but slides alone are easy to say no to. A live demo would land harder than another deck.',
     solution:
-      'Wrote the BRD and PRD, designed Figma mockups, then went further: built an actual working prototype instead of stopping at static designs.',
+      'Wrote the BRD and PRD, designed Figma mockups, and built an actual working prototype instead of stopping at static designs.',
     impact:
-      'The pitch came with a demo people could try themselves, not just a promise on paper.',
+      'The pitch came with a demo people could try themselves instead of a slide deck promising results.',
     stack: ['Figma', 'PRD/BRD', 'React', 'Vite'],
   },
 ]

@@ -7,14 +7,14 @@ const jobs = [
     company: 'MRT Jakarta',
     role: 'Station Digitalization Intern',
     dates: 'Dec 2025 – Jun 2026',
-    body: 'Room bookings across 13 stations ran through Google Forms — no real-time visibility, frequent double-bookings. Daily shift reports were stuck in slow, unfilterable Excel Online sheets. I built the systems that replaced both: a live booking platform and a data dashboard, still in production use today. Also contributed to TRAMS, a mission-critical platform migration — interviewing station staff to translate operational needs into a structured BRD for the dev team.',
+    body: 'Room bookings across 13 stations ran through Google Forms, with no real-time visibility and frequent double-bookings. Daily shift reports were stuck in slow, unfilterable Excel Online sheets. I built the systems that replaced both: a live booking platform and a data dashboard, still in production use today. I also contributed to TRAMS, a mission-critical platform migration, interviewing station staff to translate operational needs into a structured BRD for the dev team.',
     projectsAnchor: 'mrt-jakarta',
   },
   {
     company: 'Bank Rakyat Indonesia (BRI)',
     role: 'IT Intern',
     dates: 'Sep 2022 – Mar 2023',
-    body: "BRI's Consumer Business Department was managing housing/mortgage property listings manually through Google Drive — no structured catalog, hard to browse or update. I built BRIOmah to replace it. On the Operation Network & Service side, branch SOP compliance checks (staff appearance, service quality) were still paper-based — I digitized that into a web tool, and supported secret shopping evaluations and CCTV compliance reviews across branches.",
+    body: "BRI's Consumer Business Department was managing housing and mortgage property listings manually through Google Drive, with no structured catalog and no easy way to browse or update them. I built BRIOmah to replace it. On the Operation Network & Service side, branch SOP compliance checks (staff appearance, service quality) were still paper-based, so I digitized that into a web tool and supported secret shopping evaluations and CCTV compliance reviews across branches.",
     projectsAnchor: null,
   },
 ]
