@@ -55,7 +55,7 @@ function WorkExperience() {
                   </span>
                 </div>
 
-                <p className="mt-6 max-w-2xl text-sm leading-relaxed text-slate-400">
+                <p className="mt-6 text-sm leading-relaxed text-slate-400">
                   {job.body}
                 </p>
 
