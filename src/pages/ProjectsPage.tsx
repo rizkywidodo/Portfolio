@@ -40,7 +40,7 @@ const projects: Project[] = [
     title: 'Station Digitalization Proposal',
     org: 'MRT Jakarta',
     problem:
-      'Regional planners needed to pitch IT investment to leadership, and a slide deck by itself wasn\'t going to convince anyone.',
+      'Regional planners needed to pitch IT investment to leadership, and a powerpoint presentation by itself wasn\'t going to convince anyone.',
     solution:
       'Wrote the BRD and PRD, designed Figma mockups, then built a working prototype on top of them.',
     impact:
@@ -111,7 +111,7 @@ function ProjectsPage() {
       <p className="mt-4 max-w-xl text-sm text-slate-400">
         A few projects from my internship at MRT Jakarta, covering
         everything from figuring out what people needed to actually
-        shipping something they use. (Repos are private; still running in
+        shipping something they use. (Repos are private, still running in
         production.)
       </p>
 
