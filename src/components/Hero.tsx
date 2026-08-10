@@ -53,11 +53,11 @@ function Hero() {
           Rizky Widodo
         </h1>
         <p className="mt-6 leading-relaxed text-slate-400">
-          Fresh grad who spent the past year building things people at work
-          actually use, not class assignments. That meant talking through
-          requirements, writing PRDs, and shipping the result myself. I'm
-          curious by default, so if something looks interesting, I'll
-          usually just try building it before asking whether it's possible.
+          Fresh grad who spent the past year shipping things people at work
+          actually rely on, not class assignments. I talked through
+          requirements, wrote the PRDs, then built and shipped the result
+          myself. If something looks interesting, I'll usually just start
+          building before asking whether it's possible.
         </p>
 
         <div className="pointer-events-auto mt-8 flex flex-wrap gap-4">

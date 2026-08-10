@@ -29,7 +29,7 @@ const projects: Project[] = [
     title: 'Bank Data Station Dashboard',
     org: 'MRT Jakarta',
     problem:
-      'Daily Safety/Service/Security reports ran through Excel Online/Sheets, laggy and painful to filter across 4 stations. I was tasked with building a dashboard to fix that.',
+      'I was asked to build a dashboard for daily Safety/Service/Security reports that were stuck in laggy, hard-to-filter Excel Online sheets across 4 stations.',
     solution:
       'I proposed a real web app: a pipeline that turns the raw form export into a live, filterable dashboard with real-time stats, category breakdowns, per-station trends, and drill-down into individual reports with photo attachments.',
     impact:
@@ -109,9 +109,10 @@ function ProjectsPage() {
 
       <h1 className="font-pixel mt-6 text-xl text-cyan">// PROJECTS</h1>
       <p className="mt-4 max-w-xl text-sm text-slate-400">
-        A few projects from my internship at MRT Jakarta, from figuring out
-        what people actually needed to shipping something they use. (Repos
-        are private — still running in production.)
+        A few projects from my internship at MRT Jakarta, covering
+        everything from figuring out what people needed to actually
+        shipping something they use. (Repos are private; still running in
+        production.)
       </p>
 
       {companies.map((company) => (
