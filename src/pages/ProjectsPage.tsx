@@ -29,7 +29,7 @@ const projects: Project[] = [
     title: 'Bank Data Station Dashboard',
     org: 'MRT Jakarta',
     problem:
-      'I was asked to build a dashboard for daily Safety/Service/Security reports that were stuck in laggy Excel Online sheets, painful to filter across 4 stations.',
+      'I was asked to build a dashboard for daily Safety/Service/Security reports that were stuck in laggy Excel Online sheets, painful to filter across 13 stations.',
     solution:
       'I proposed a real web app: a pipeline that turns the raw form export into a live, filterable dashboard, with stats that update in real time, category breakdowns, trends by station, and the ability to dig into individual reports with photo attachments.',
     impact:
