@@ -8,7 +8,7 @@ import {
   SHIP_PATTERN,
   STOP_PATTERN,
 } from './pixelSprites'
-import { playCoin, playExplosion, playShoot, unlockAudio } from '../lib/sound'
+import { playCoin, playExplosion, playGameOver, playShoot, unlockAudio } from '../lib/sound'
 import { BOSS_DEFEATED_EVENT, KONAMI_EVENT } from './KonamiEasterEgg'
 
 type Alien = {
@@ -169,15 +169,33 @@ function SpaceInvaders({
       const shouldDescend = frameRef.current % DESCEND_EVERY_N_FRAMES === 0
 
       if (shouldDescend) {
+        // An alien reaching the ground during the real wave (not the boss
+        // fight, where these keep drifting offscreen unseen) ends the run —
+        // otherwise the swarm loops forever and the high score never means
+        // an actual survived attempt.
+        let grounded = false
         currentAliens = currentAliens.map((a) => {
           if (a.hidden) return a
           const y = a.y + DESCEND_PER_TICK
-          return y > 90
-            ? { ...a, x: randomX(), y: spawnY(12), color: randomColor() }
-            : { ...a, y }
+          if (y > 90) {
+            if (!bossActiveRef.current) grounded = true
+            return { ...a, x: randomX(), y: spawnY(12), color: randomColor() }
+          }
+          return { ...a, y }
         })
         aliensRef.current = currentAliens
         setAliens(currentAliens)
+
+        if (grounded) {
+          playingRef.current = false
+          setPlaying(false)
+          bulletsRef.current = []
+          setBullets([])
+          for (const t of respawnTimeouts.current) clearTimeout(t)
+          respawnTimeouts.current = []
+          playGameOver()
+          return
+        }
       }
 
       const bossFight = bossActiveRef.current

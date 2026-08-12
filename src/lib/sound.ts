@@ -84,6 +84,24 @@ export function playHop() {
   osc.stop(audio.currentTime + 0.15)
 }
 
+export function playGameOver() {
+  const audio = getContext()
+  const now = audio.currentTime
+  const notes = [392, 349, 294, 220] // descending G4-F4-D4-A3, classic "you died" jingle
+  notes.forEach((freq, i) => {
+    const start = now + i * 0.12
+    const osc = audio.createOscillator()
+    const gain = audio.createGain()
+    osc.type = 'square'
+    osc.frequency.setValueAtTime(freq, start)
+    gain.gain.setValueAtTime(0.09, start)
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22)
+    osc.connect(gain).connect(audio.destination)
+    osc.start(start)
+    osc.stop(start + 0.22)
+  })
+}
+
 export function playExplosion() {
   const audio = getContext()
   const duration = 0.25
