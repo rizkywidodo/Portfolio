@@ -12,6 +12,8 @@ type Project = {
   solution: string
   impact: string
   stack: string[]
+  demoUrl?: string
+  repoUrl?: string
 }
 
 const projects: Project[] = [
@@ -35,6 +37,8 @@ const projects: Project[] = [
     impact:
       'Now used daily to analyze complaints and findings across stations, with reports updating the moment they\'re uploaded.',
     stack: ['React', 'TypeScript', 'Vite', 'Supabase', 'Cloudflare'],
+    demoUrl: 'https://bank-data-station-portfolio.vercel.app',
+    repoUrl: 'https://github.com/rizkywidodo/bank-data-station-portfolio',
   },
   {
     title: 'Station Digitalization Proposal',
@@ -111,8 +115,8 @@ function ProjectsPage() {
       <p className="mt-4 max-w-xl text-sm text-slate-400">
         A few projects from my internship at MRT Jakarta, covering
         everything from figuring out what people needed to actually
-        shipping something they use. (Repos are private, still running in
-        production.)
+        shipping something they use. (Original repos are private and still
+        running in production; sanitized clones are linked where available.)
       </p>
 
       {companies.map((company) => (
@@ -182,6 +186,31 @@ function ProjectsPage() {
                               </li>
                             ))}
                           </ul>
+
+                          {(project.demoUrl || project.repoUrl) && (
+                            <div className="mt-8 flex flex-wrap gap-3">
+                              {project.demoUrl && (
+                                <a
+                                  href={project.demoUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="font-pixel border-2 border-cyan px-4 py-2 text-[11px] text-cyan transition-colors hover:bg-cyan hover:text-bg"
+                                >
+                                  LIVE DEMO ↗
+                                </a>
+                              )}
+                              {project.repoUrl && (
+                                <a
+                                  href={project.repoUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="font-pixel border-2 border-border px-4 py-2 text-[11px] text-slate-300 transition-colors hover:border-pink hover:text-pink"
+                                >
+                                  SOURCE ↗
+                                </a>
+                              )}
+                            </div>
+                          )}
                         </>
                       )}
 

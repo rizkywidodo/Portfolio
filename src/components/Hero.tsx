@@ -10,6 +10,7 @@ const contacts = [
     label: 'LinkedIn',
     href: 'https://linkedin.com/in/muhammad-rizky-widodo',
   },
+  { label: 'GitHub', href: 'https://github.com/rizkywidodo' },
 ]
 
 function Hero() {
@@ -71,8 +72,8 @@ function Hero() {
             <a
               key={contact.label}
               href={contact.href}
-              target={contact.label === 'LinkedIn' ? '_blank' : undefined}
-              rel={contact.label === 'LinkedIn' ? 'noreferrer' : undefined}
+              target={contact.label !== 'Email' ? '_blank' : undefined}
+              rel={contact.label !== 'Email' ? 'noreferrer' : undefined}
               className="font-pixel border-4 border-border px-5 py-3 text-[11px] text-slate-300 shadow-[4px_4px_0_0_var(--color-panel)] transition-transform hover:-translate-y-0.5 hover:border-pink hover:text-pink hover:shadow-[6px_6px_0_0_var(--color-panel)]"
             >
               {contact.label.toUpperCase()}
