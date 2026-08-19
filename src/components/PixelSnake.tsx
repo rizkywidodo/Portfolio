@@ -80,22 +80,24 @@ function Snake({
     <>
       {segments.map((seg, i) => {
         const isHead = i === 0
+        const isTailTip = i === segments.length - 1
         return (
           <span
             key={i}
-            className="absolute bg-green"
+            className={`absolute border-2 border-bg ${isHead ? 'bg-yellow' : 'bg-green'}`}
             style={{
               left: seg.x * CELL,
               top: seg.y * CELL,
               width: CELL - 2,
               height: CELL - 2,
-              opacity: 1 - i * 0.08,
+              opacity: isHead ? 1 : i % 2 === 0 ? 0.9 : 0.6,
+              transform: isTailTip ? 'scale(0.6)' : undefined,
             }}
           >
             {isHead && (
               <>
-                <span className="absolute top-1 right-1 h-1 w-1 bg-bg" />
-                <span className="absolute right-1 bottom-1 h-1 w-1 bg-bg" />
+                <span className="absolute top-0.5 right-0.5 h-1 w-1 bg-bg" />
+                <span className="absolute right-0.5 bottom-0.5 h-1 w-1 bg-bg" />
               </>
             )}
           </span>
